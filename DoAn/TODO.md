@@ -1,16 +1,16 @@
 # TODO - Convert DoAn to be similar to p5 (~85% target)
 
-## Phase 1: Restructure File Organization
+## Phase 1: Restructure File Organization ✅
 - [x] Move data to js/data.js (separate from app.js)
 - [x] Create js/utils/ for utility functions
 - [x] Create js/components/ for UI components
 - [x] Create js/views/ for admin views
 
-## Phase 2: Create/Enhance Components
+## Phase 2: Create/Enhance Components ✅
 - [x] Enhance Toast component
 - [x] Enhance CartDrawer component
 - [x] Enhance AuthModal component  
-- [x] Enhance Chatbot component
+- [x] Enhance Chatbot component (AI-style with typing indicator)
 - [x] Create HeroCarousel component
 - [x] Create BookCard component
 - [x] Create AdminHeader component
@@ -18,7 +18,7 @@
 - [x] Create LogoutModal component
 - [x] Create BookDetailsModal component
 
-## Phase 3: Enhance Admin Views
+## Phase 3: Enhance Admin Views ✅
 - [x] Create Overview view with charts
 - [x] Enhance BookInfoManagement with CRUD
 - [x] Create ImportManagement view
@@ -29,8 +29,14 @@
 - [x] Create Settings view
 - [x] Create Contact view
 
-## Phase 4: Refactor Main App
+## Phase 4: Refactor Main App ✅
 - [x] Update index.html to include all components
 - [x] Refactor app.js to use modular structure
 - [x] Update CSS for better styling consistency
+
+## Phase 5: Enhanced Features v2 ✅
+- [x] Enhanced Chatbot with AI-style UI, typing indicator
+- [x] Auto-creating chatbot elements (no HTML needed)
+- [x] Improved animations and transitions
+- [x] Better responsive design
 
