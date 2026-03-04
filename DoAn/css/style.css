@@ -491,6 +491,16 @@ input, textarea {
 /* ==================== FLASH SALE ==================== */
 .flash-sale {
   margin: 48px 0;
+  /* p5 style gradient border */
+  background: linear-gradient(to right, #f97316, #ef4444);
+  padding: 4px;
+  border-radius: 28px;
+}
+
+.flash-sale-inner {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
 }
 
 .flash-sale-header {

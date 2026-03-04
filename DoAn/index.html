@@ -133,36 +133,38 @@
           <div class="hero-indicators" id="hero-indicators"></div>
         </section>
 
-        <!-- Flash Sale -->
+<!-- Flash Sale -->
         <section class="flash-sale">
-          <div class="flash-sale-header">
-            <div class="flash-sale-title">
-              <div class="flash-icon">
-                <i class="fas fa-fire"></i>
+          <div class="flash-sale-inner">
+            <div class="flash-sale-header">
+              <div class="flash-sale-title">
+                <div class="flash-icon">
+                  <i class="fas fa-fire"></i>
+                </div>
+                <div>
+                  <h3>Flash Sale <span>Giá Sốc</span></h3>
+                  <p>Kết thúc trong</p>
+                </div>
               </div>
-              <div>
-                <h3>Flash Sale <span>Giá Sốc</span></h3>
-                <p>Kết thúc trong</p>
+              <div class="flash-timer">
+                <div class="timer-block">
+                  <div class="timer-value" id="hours">12</div>
+                  <span>Giờ</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <div class="timer-value" id="minutes">45</div>
+                  <span>Phút</span>
+                </div>
+                <span class="timer-sep">:</span>
+                <div class="timer-block">
+                  <div class="timer-value timer-seconds" id="seconds">30</div>
+                  <span>Giây</span>
+                </div>
               </div>
             </div>
-            <div class="flash-timer">
-              <div class="timer-block">
-                <div class="timer-value" id="hours">12</div>
-                <span>Giờ</span>
-              </div>
-              <span class="timer-sep">:</span>
-              <div class="timer-block">
-                <div class="timer-value" id="minutes">45</div>
-                <span>Phút</span>
-              </div>
-              <span class="timer-sep">:</span>
-              <div class="timer-block">
-                <div class="timer-value timer-seconds" id="seconds">30</div>
-                <span>Giây</span>
-              </div>
-            </div>
+            <div class="books-grid" id="flash-sale-books"></div>
           </div>
-          <div class="books-grid" id="flash-sale-books"></div>
         </section>
 
         <!-- Categories -->
@@ -465,7 +467,7 @@
   <script src="js/components/imageGeneratorModal.js"></script>
   <script src="js/components/logoutModal.js"></script>
   
-  <!-- Views -->
+<!-- Views -->
   <script src="js/views/overview.js"></script>
   <script src="js/views/bookInfoManagement.js"></script>
   <script src="js/views/importManagement.js"></script>
