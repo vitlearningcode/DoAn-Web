@@ -1,4 +1,4 @@
-// ==================== MAIN APP - ALL IN ONE FILE ====================
+// ==================== MAIN APP - ENHANCED VERSION ====================
 
 // ==================== DATA ====================
 const featuredBooks = [
@@ -27,6 +27,7 @@ let currentAdminView = 'overview';
 let selectedBook = null;
 let currentQty = 1;
 let currentHeroSlide = 0;
+let wishlists = new Set();
 
 // ==================== UTILITIES ====================
 function formatPrice(price) {
@@ -41,32 +42,79 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// Enhanced book card with discount calculation
 function createBookCard(book, isFlashSale = false) {
   const displayPrice = isFlashSale ? Math.floor(book.price * 0.7) : book.price;
   const displayOriginal = isFlashSale ? book.price : book.originalPrice;
+  const discount = displayOriginal ? Math.round((1 - displayPrice / displayOriginal) * 100) : 0;
+  const isWishlisted = wishlists.has(book.id);
   
   return `
     <div class="book-card" data-book-id="${book.id}">
       <div class="book-image">
-        <img src="${book.image}" alt="${book.name}">
-        <span class="book-badge ${isFlashSale ? 'flash' : ''}">${isFlashSale ? 'Flash Sale' : (book.badge || '')}</span>
+        <img src="${book.image}" alt="${book.name}" referrerPolicy="no-referrer">
+        
+        <!-- Badges -->
+        <div class="book-badges">
+          ${book.badge ? `<span class="book-badge">${book.badge}</span>` : ''}
+          ${discount > 0 ? `<span class="book-badge discount">-${discount}%</span>` : ''}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="book-quick-actions">
+          <button class="book-quick-btn wishlist ${isWishlisted ? 'active' : ''}" data-id="${book.id}" title="Yêu thích">
+            <i class="fas fa-heart ${isWishlisted ? 'fas' : 'far'}"></i>
+          </button>
+          <button class="book-quick-btn" onclick="event.stopPropagation(); quickViewBook('${book.id}')" title="Xem nhanh">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <!-- Quick Add -->
+        <div class="book-quick-add">
+          <button onclick="event.stopPropagation(); quickAddToCart('${book.id}')">
+            <i class="fas fa-shopping-cart"></i> Thêm Nhanh
+          </button>
+        </div>
       </div>
+      
       <div class="book-info">
+        <span class="book-category">${book.category}</span>
         <h3 class="book-name">${book.name}</h3>
         <p class="book-author">${book.author}</p>
+        <div class="book-rating">
+          <i class="fas fa-star"></i>
+          <span>${book.rating}</span>
+          <span class="reviews-count">(${book.reviews})</span>
+        </div>
         <div class="book-card-bottom">
           <div class="book-price">
             <span class="current-price">${formatPrice(displayPrice)}</span>
             ${displayOriginal ? `<span class="original-price">${formatPrice(displayOriginal)}</span>` : ''}
           </div>
-          <div class="book-rating">
-            <i class="fas fa-star"></i>
-            <span>${book.rating}</span>
-          </div>
+          <button class="add-cart-btn" onclick="event.stopPropagation(); addToCartFromCard('${book.id}')">
+            <i class="fas fa-shopping-cart"></i>
+          </button>
         </div>
       </div>
     </div>
   `;
+}
+
+// Quick functions for inline handlers
+function quickAddToCart(id) {
+  const book = [...featuredBooks, ...newReleases].find(b => b.id === id);
+  if (book) addToCart(book);
+}
+
+function quickViewBook(id) {
+  const book = [...featuredBooks, ...newReleases].find(b => b.id === id);
+  if (book) openBookModal(book);
+}
+
+function addToCartFromCard(id) {
+  const book = [...featuredBooks, ...newReleases].find(b => b.id === id);
+  if (book) addToCart(book);
 }
 
 // ==================== ROLE TOGGLE ====================
@@ -97,20 +145,25 @@ function initRoleToggle() {
 // ==================== HERO CAROUSEL ====================
 function initHeroCarousel() {
   const slides = document.querySelectorAll('.hero-slide');
-  const dotsContainer = document.getElementById('hero-dots');
+  const indicatorsContainer = document.getElementById('hero-indicators');
+  const prevBtn = document.getElementById('hero-prev');
+  const nextBtn = document.getElementById('hero-next');
   
-  // Create dots
+  // Create indicators
   slides.forEach((_, index) => {
-    const dot = document.createElement('div');
-    dot.className = `hero-dot ${index === 0 ? 'active' : ''}`;
-    dot.addEventListener('click', () => goToSlide(index));
-    dotsContainer.appendChild(dot);
+    const indicator = document.createElement('div');
+    indicator.className = `hero-indicator ${index === 0 ? 'active' : ''}`;
+    indicator.addEventListener('click', () => goToSlide(index));
+    indicatorsContainer.appendChild(indicator);
   });
+
+  // Navigation
+  prevBtn.addEventListener('click', () => prevSlide());
+  nextBtn.addEventListener('click', () => nextSlide());
 
   // Auto slide
   setInterval(() => {
-    currentHeroSlide = (currentHeroSlide + 1) % slides.length;
-    updateHeroSlide();
+    nextSlide();
   }, 5000);
 }
 
@@ -119,16 +172,28 @@ function goToSlide(index) {
   updateHeroSlide();
 }
 
+function nextSlide() {
+  const slides = document.querySelectorAll('.hero-slide');
+  currentHeroSlide = (currentHeroSlide + 1) % slides.length;
+  updateHeroSlide();
+}
+
+function prevSlide() {
+  const slides = document.querySelectorAll('.hero-slide');
+  currentHeroSlide = (currentHeroSlide - 1 + slides.length) % slides.length;
+  updateHeroSlide();
+}
+
 function updateHeroSlide() {
   const slides = document.querySelectorAll('.hero-slide');
-  const dots = document.querySelectorAll('.hero-dot');
+  const indicators = document.querySelectorAll('.hero-indicator');
   
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === currentHeroSlide);
   });
   
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === currentHeroSlide);
+  indicators.forEach((indicator, i) => {
+    indicator.classList.toggle('active', i === currentHeroSlide);
   });
 }
 
@@ -140,18 +205,9 @@ function initFlashSaleTimer() {
 
   setInterval(() => {
     seconds--;
-    if (seconds < 0) {
-      seconds = 59;
-      minutes--;
-      if (minutes < 0) {
-        minutes = 59;
-        hours--;
-        if (hours < 0) {
-          hours = 24;
-        }
-      }
-    }
-    
+    if (seconds < 0) { seconds = 59; minutes--; }
+    if (minutes < 0) { minutes = 59; hours--; }
+    if (hours < 0) { hours = 24; }
     document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
     document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
     document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
@@ -173,16 +229,36 @@ function renderBooks() {
   // New Releases
   newReleasesContainer.innerHTML = newReleases.map(book => createBookCard(book)).join('');
 
-  // Add click handlers
+  // Add click handlers for cards
   document.querySelectorAll('.book-card').forEach(card => {
     card.addEventListener('click', () => {
       const bookId = card.dataset.bookId;
       const book = [...featuredBooks, ...newReleases].find(b => b.id === bookId);
-      if (book) {
-        openBookModal(book);
-      }
+      if (book) openBookModal(book);
     });
   });
+
+  // Add wishlist handlers
+  document.querySelectorAll('.book-quick-btn.wishlist').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      toggleWishlist(id, btn);
+    });
+  });
+}
+
+function toggleWishlist(id, btn) {
+  if (wishlists.has(id)) {
+    wishlists.delete(id);
+    btn.classList.remove('active');
+    btn.innerHTML = '<i class="far fa-heart"></i>';
+  } else {
+    wishlists.add(id);
+    btn.classList.add('active');
+    btn.innerHTML = '<i class="fas fa-heart"></i>';
+    showToast('Đã thêm vào yêu thích');
+  }
 }
 
 // ==================== CART FUNCTIONALITY ====================
@@ -273,34 +349,33 @@ function updateCartUI() {
 window.updateCartQuantity = updateCartQuantity;
 window.removeFromCart = removeFromCart;
 window.addToCart = addToCart;
+window.quickAddToCart = quickAddToCart;
+window.quickViewBook = quickViewBook;
+window.addToCartFromCard = addToCartFromCard;
 
 // ==================== BOOK MODAL ====================
 function initBookModal() {
   const bookModal = document.getElementById('book-modal');
   const bookClose = document.getElementById('book-close');
-  const qtyMinus = document.getElementById('qty-minus');
-  const qtyPlus = document.getElementById('qty-plus');
-  const qtyInput = document.getElementById('qty-input');
-  const addToCartBtn = document.getElementById('btn-add-to-cart');
 
   bookClose.addEventListener('click', closeBookModal);
   bookModal.addEventListener('click', (e) => {
     if (e.target === bookModal) closeBookModal();
   });
 
-  qtyMinus.addEventListener('click', () => {
+  document.getElementById('qty-minus').addEventListener('click', () => {
     if (currentQty > 1) {
       currentQty--;
-      qtyInput.value = currentQty;
+      document.getElementById('qty-input').value = currentQty;
     }
   });
 
-  qtyPlus.addEventListener('click', () => {
+  document.getElementById('qty-plus').addEventListener('click', () => {
     currentQty++;
-    qtyInput.value = currentQty;
+    document.getElementById('qty-input').value = currentQty;
   });
 
-  addToCartBtn.addEventListener('click', () => {
+  document.getElementById('btn-add-to-cart').addEventListener('click', () => {
     if (selectedBook) {
       addToCart(selectedBook, currentQty);
       closeBookModal();
@@ -313,16 +388,41 @@ function openBookModal(book) {
   currentQty = 1;
   
   document.getElementById('book-detail-image').src = book.image;
-  document.getElementById('book-detail-badge').textContent = book.badge || '';
-  document.getElementById('book-detail-badge').style.display = book.badge ? 'inline-block' : 'none';
+  
+  // Badges
+  const badgeEl = document.getElementById('book-detail-badge');
+  const discountEl = document.getElementById('book-detail-discount');
+  
+  if (book.badge) {
+    badgeEl.textContent = book.badge;
+    badgeEl.style.display = 'inline-block';
+  } else {
+    badgeEl.style.display = 'none';
+  }
+  
+  const discount = book.originalPrice ? Math.round((1 - book.price / book.originalPrice) * 100) : 0;
+  if (discount > 0) {
+    discountEl.textContent = `-${discount}%`;
+    discountEl.style.display = 'inline-block';
+  } else {
+    discountEl.style.display = 'none';
+  }
+  
   document.getElementById('book-detail-name').textContent = book.name;
   document.getElementById('book-detail-author').textContent = `Tác giả: ${book.author}`;
   document.getElementById('book-detail-rating').textContent = book.rating;
   document.getElementById('book-detail-reviews').textContent = book.reviews;
   document.getElementById('book-detail-price').textContent = formatPrice(book.price);
-  document.getElementById('book-detail-original').textContent = book.originalPrice ? formatPrice(book.originalPrice) : '';
-  document.getElementById('book-detail-original').style.display = book.originalPrice ? 'inline' : 'none';
-  document.getElementById('book-detail-description').textContent = book.description || `Cuốn sách "${book.name}" của tác giả ${book.author}, thuộc thể loại ${book.category}. Đây là một cuốn sách rất đáng đọc với nội dung hấp dẫn và bổ ích.`;
+  
+  const originalEl = document.getElementById('book-detail-original');
+  if (book.originalPrice) {
+    originalEl.textContent = formatPrice(book.originalPrice);
+    originalEl.style.display = 'inline';
+  } else {
+    originalEl.style.display = 'none';
+  }
+  
+  document.getElementById('book-detail-description').textContent = `Cuốn sách "${book.name}" của tác giả ${book.author}, thuộc thể loại ${book.category}. Đây là một cuốn sách rất đáng đọc với nội dung hấp dẫn và bổ ích.`;
   document.getElementById('qty-input').value = 1;
 
   document.getElementById('book-modal').classList.add('active');
@@ -338,21 +438,14 @@ function initAuthModal() {
   const authBtn = document.getElementById('btn-login');
   const authModal = document.getElementById('auth-modal');
   const authClose = document.getElementById('auth-close');
-  const authForm = document.getElementById('auth-form');
 
-  authBtn.addEventListener('click', () => {
-    authModal.classList.add('active');
-  });
-
-  authClose.addEventListener('click', () => {
-    authModal.classList.remove('active');
-  });
-
+  authBtn.addEventListener('click', () => authModal.classList.add('active'));
+  authClose.addEventListener('click', () => authModal.classList.remove('active'));
   authModal.addEventListener('click', (e) => {
     if (e.target === authModal) authModal.classList.remove('active');
   });
 
-  authForm.addEventListener('submit', (e) => {
+  document.getElementById('auth-form').addEventListener('submit', (e) => {
     e.preventDefault();
     showToast('Đăng nhập thành công!');
     authModal.classList.remove('active');
@@ -412,27 +505,9 @@ const adminViews = {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>#DH001</td>
-            <td>Nguyễn Văn A</td>
-            <td>Đắc Nhân Tâm</td>
-            <td>86,000đ</td>
-            <td><span class="status-badge success">Hoàn thành</span></td>
-          </tr>
-          <tr>
-            <td>#DH002</td>
-            <td>Trần Thị B</td>
-            <td>Nhà Giả Kim</td>
-            <td>79,000đ</td>
-            <td><span class="status-badge warning">Đang xử lý</span></td>
-          </tr>
-          <tr>
-            <td>#DH003</td>
-            <td>Lê Văn C</td>
-            <td>Atomic Habits</td>
-            <td>145,000đ</td>
-            <td><span class="status-badge danger">Chờ thanh toán</span></td>
-          </tr>
+          <tr><td>#DH001</td><td>Nguyễn Văn A</td><td>Đắc Nhân Tâm</td><td>86,000đ</td><td><span class="status-badge success">Hoàn thành</span></td></tr>
+          <tr><td>#DH002</td><td>Trần Thị B</td><td>Nhà Giả Kim</td><td>79,000đ</td><td><span class="status-badge warning">Đang xử lý</span></td></tr>
+          <tr><td>#DH003</td><td>Lê Văn C</td><td>Atomic Habits</td><td>145,000đ</td><td><span class="status-badge danger">Chờ thanh toán</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -441,7 +516,7 @@ const adminViews = {
   import: `
     <div class="admin-card">
       <div class="admin-card-header">
-        <h3>Quản lý nhập hàng</h3>
+        <h3>Quản lý nhập sách</h3>
         <button class="submit-btn" style="width: auto; padding: 10px 20px;">+ Thêm đơn nhập</button>
       </div>
       <table class="admin-table">
@@ -456,22 +531,8 @@ const adminViews = {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>#PN001</td>
-            <td>20/01/2024</td>
-            <td>Công ty ABC</td>
-            <td>500</td>
-            <td>50,000,000đ</td>
-            <td><span class="status-badge success">Hoàn thành</span></td>
-          </tr>
-          <tr>
-            <td>#PN002</td>
-            <td>22/01/2024</td>
-            <td>Công ty XYZ</td>
-            <td>300</td>
-            <td>30,000,000đ</td>
-            <td><span class="status-badge warning">Đang chờ</span></td>
-          </tr>
+          <tr><td>#PN001</td><td>20/01/2024</td><td>Công ty ABC</td><td>500</td><td>50,000,000đ</td><td><span class="status-badge success">Hoàn thành</span></td></tr>
+          <tr><td>#PN002</td><td>22/01/2024</td><td>Công ty XYZ</td><td>300</td><td>30,000,000đ</td><td><span class="status-badge warning">Đang chờ</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -535,18 +596,9 @@ const adminViews = {
       </div>
     </div>
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Doanh thu theo ngày</h3>
-      </div>
+      <div class="admin-card-header"><h3>Doanh thu theo ngày</h3></div>
       <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Ngày</th>
-            <th>Số đơn</th>
-            <th>Doanh thu</th>
-            <th>Lợi nhuận</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Ngày</th><th>Số đơn</th><th>Doanh thu</th><th>Lợi nhuận</th></tr></thead>
         <tbody>
           <tr><td>20/01/2024</td><td>45</td><td>4,500,000đ</td><td>1,350,000đ</td></tr>
           <tr><td>19/01/2024</td><td>52</td><td>5,200,000đ</td><td>1,560,000đ</td></tr>
@@ -558,40 +610,12 @@ const adminViews = {
   
   sales: `
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Quản lý bán hàng</h3>
-      </div>
+      <div class="admin-card-header"><h3>Quản lý bán hàng</h3></div>
       <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Mã đơn</th>
-            <th>Khách hàng</th>
-            <th>Sản phẩm</th>
-            <th>Số lượng</th>
-            <th>Tổng tiền</th>
-            <th>Ngày đặt</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Số lượng</th><th>Tổng tiền</th><th>Ngày đặt</th><th>Trạng thái</th></tr></thead>
         <tbody>
-          <tr>
-            <td>#DH001</td>
-            <td>Nguyễn Văn A</td>
-            <td>Đắc Nhân Tâm</td>
-            <td>2</td>
-            <td>172,000đ</td>
-            <td>20/01/2024</td>
-            <td><span class="status-badge success">Hoàn thành</span></td>
-          </tr>
-          <tr>
-            <td>#DH002</td>
-            <td>Trần Thị B</td>
-            <td>Nhà Giả Kim</td>
-            <td>1</td>
-            <td>79,000đ</td>
-            <td>20/01/2024</td>
-            <td><span class="status-badge warning">Đang xử lý</span></td>
-          </tr>
+          <tr><td>#DH001</td><td>Nguyễn Văn A</td><td>Đắc Nhân Tâm</td><td>2</td><td>172,000đ</td><td>20/01/2024</td><td><span class="status-badge success">Hoàn thành</span></td></tr>
+          <tr><td>#DH002</td><td>Trần Thị B</td><td>Nhà Giả Kim</td><td>1</td><td>79,000đ</td><td>20/01/2024</td><td><span class="status-badge warning">Đang xử lý</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -599,20 +623,9 @@ const adminViews = {
   
   inventory: `
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Quản lý tồn kho</h3>
-      </div>
+      <div class="admin-card-header"><h3>Quản lý kho</h3></div>
       <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Mã sách</th>
-            <th>Tên sách</th>
-            <th>Tồn kho</th>
-            <th>Đã bán</th>
-            <th>Còn lại</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Mã sách</th><th>Tên sách</th><th>Tồn kho</th><th>Đã bán</th><th>Còn lại</th><th>Trạng thái</th></tr></thead>
         <tbody>
           ${featuredBooks.slice(0, 5).map(book => {
             const sold = Math.floor(Math.random() * 50);
@@ -635,9 +648,7 @@ const adminViews = {
   
   reports: `
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Báo cáo tổng hợp</h3>
-      </div>
+      <div class="admin-card-header"><h3>Báo cáo tổng hợp</h3></div>
       <div style="padding: 40px; text-align: center; color: var(--gray-500);">
         <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 16px;"></i>
         <p>Biểu đồ và báo cáo chi tiết sẽ được hiển thị tại đây</p>
@@ -647,65 +658,23 @@ const adminViews = {
   
   settings: `
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Cài đặt hệ thống</h3>
-      </div>
-      <div class="form-group">
-        <label>Tên cửa hàng</label>
-        <input type="text" value="Book Sales Store">
-      </div>
-      <div class="form-group">
-        <label>Email liên hệ</label>
-        <input type="email" value="contact@booksales.vn">
-      </div>
-      <div class="form-group">
-        <label>Điện thoại</label>
-        <input type="tel" value="1900 xxxx">
-      </div>
-      <div class="form-group">
-        <label>Địa chỉ</label>
-        <input type="text" value="123 Đường ABC, Quận 1, TP.HCM">
-      </div>
+      <div class="admin-card-header"><h3>Cài đặt hệ thống</h3></div>
+      <div class="form-group"><label>Tên cửa hàng</label><input type="text" value="Book Sales Store"></div>
+      <div class="form-group"><label>Email liên hệ</label><input type="email" value="contact@booksales.vn"></div>
+      <div class="form-group"><label>Điện thoại</label><input type="tel" value="1900 xxxx"></div>
+      <div class="form-group"><label>Địa chỉ</label><input type="text" value="123 Đường ABC, Quận 1, TP.HCM"></div>
       <button class="submit-btn">Lưu thay đổi</button>
     </div>
   `,
   
   contact: `
     <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Quản lý liên hệ</h3>
-      </div>
+      <div class="admin-card-header"><h3>Hỗ trợ & Liên hệ</h3></div>
       <table class="admin-table">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Họ tên</th>
-            <th>Email</th>
-            <th>Tiêu đề</th>
-            <th>Nội dung</th>
-            <th>Ngày gửi</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
+        <thead><tr><th>STT</th><th>Họ tên</th><th>Email</th><th>Tiêu đề</th><th>Nội dung</th><th>Ngày gửi</th><th>Trạng thái</th></tr></thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Nguyễn Văn A</td>
-            <td>a@gmail.com</td>
-            <td>Hỏi về sách</td>
-            <td>Tôi muốn hỏi về...</td>
-            <td>20/01/2024</td>
-            <td><span class="status-badge warning">Chưa đọc</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Trần Thị B</td>
-            <td>b@gmail.com</td>
-            <td>Góp ý</td>
-            <td>Cửa hàng nên...</td>
-            <td>19/01/2024</td>
-            <td><span class="status-badge success">Đã trả lời</span></td>
-          </tr>
+          <tr><td>1</td><td>Nguyễn Văn A</td><td>a@gmail.com</td><td>Hỏi về sách</td><td>Tôi muốn hỏi về...</td><td>20/01/2024</td><td><span class="status-badge warning">Chưa đọc</span></td></tr>
+          <tr><td>2</td><td>Trần Thị B</td><td>b@gmail.com</td><td>Góp ý</td><td>Cửa hàng nên...</td><td>19/01/2024</td><td><span class="status-badge success">Đã trả lời</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -719,14 +688,14 @@ function loadAdminView(view) {
   
   const titles = {
     overview: 'Tổng quan',
-    import: 'Nhập hàng',
-    'book-info': 'Thông tin sách',
-    revenue: 'Doanh thu',
-    sales: 'Bán hàng',
-    inventory: 'Tồn kho',
+    import: 'Quản lý nhập sách',
+    'book-info': 'Quản lý thông tin sách',
+    revenue: 'Quản lý doanh thu',
+    sales: 'Quản lý bán hàng',
+    inventory: 'Quản lý kho',
     reports: 'Báo cáo',
-    settings: 'Cài đặt',
-    contact: 'Liên hệ'
+    settings: 'Cài đặt hệ thống',
+    contact: 'Hỗ trợ & Liên hệ'
   };
   
   viewTitle.textContent = titles[view] || 'Tổng quan';
@@ -734,7 +703,9 @@ function loadAdminView(view) {
   
   // Update active nav item
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.view === view);
+    if (item.dataset.view) {
+      item.classList.toggle('active', item.dataset.view === view);
+    }
   });
 }
 
@@ -757,34 +728,25 @@ function initChatbot() {
   const chatbotToggle = document.getElementById('chatbot-toggle');
   const chatbot = document.getElementById('chatbot');
   const chatbotClose = document.getElementById('chatbot-close');
-  const chatbotSend = document.getElementById('chatbot-send');
-  const chatbotInput = document.getElementById('chatbot-input');
   const messagesContainer = document.getElementById('chatbot-messages');
 
-  chatbotToggle.addEventListener('click', () => {
-    chatbot.classList.toggle('active');
-  });
-
-  chatbotClose.addEventListener('click', () => {
-    chatbot.classList.remove('active');
-  });
+  chatbotToggle.addEventListener('click', () => chatbot.classList.toggle('active'));
+  chatbotClose.addEventListener('click', () => chatbot.classList.remove('active'));
 
   function sendMessage() {
-    const message = chatbotInput.value.trim();
+    const input = document.getElementById('chatbot-input');
+    const message = input.value.trim();
     if (!message) return;
 
-    // Add user message
     const userMsg = document.createElement('div');
     userMsg.className = 'chatbot-message user';
     userMsg.innerHTML = `<p>${message}</p>`;
     messagesContainer.appendChild(userMsg);
-    chatbotInput.value = '';
+    input.value = '';
 
-    // Simulate bot response
     setTimeout(() => {
       const botMsg = document.createElement('div');
       botMsg.className = 'chatbot-message bot';
-      
       const responses = [
         'Cảm ơn bạn đã liên hệ! Tôi có thể giúp gì cho bạn?',
         'Bạn có thể tìm kiếm sách theo tên, tác giả hoặc thể loại.',
@@ -792,15 +754,14 @@ function initChatbot() {
         'Chúng tôi có chương trình khuyến mãi đặc biệt vào cuối tuần này!',
         'Bạn cần hỗ trợ về đơn hàng nào? Tôi sẽ giúp bạn kiểm tra.'
       ];
-      
       botMsg.innerHTML = `<p>${responses[Math.floor(Math.random() * responses.length)]}</p>`;
       messagesContainer.appendChild(botMsg);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }, 1000);
   }
 
-  chatbotSend.addEventListener('click', sendMessage);
-  chatbotInput.addEventListener('keypress', (e) => {
+  document.getElementById('chatbot-send').addEventListener('click', sendMessage);
+  document.getElementById('chatbot-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
   });
 }
