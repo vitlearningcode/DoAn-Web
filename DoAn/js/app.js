@@ -1,3 +1,5 @@
+// ==================== MAIN APP - ALL IN ONE FILE ====================
+
 // ==================== DATA ====================
 const featuredBooks = [
   { id: '1', name: 'Đắc Nhân Tâm', author: 'Dale Carnegie', category: 'Kỹ năng sống', price: 86000, originalPrice: 120000, rating: 4.8, reviews: 1240, image: 'https://picsum.photos/seed/book1/300/400', badge: 'Bán chạy' },
@@ -39,7 +41,6 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// ==================== BOOK CARD HTML ====================
 function createBookCard(book, isFlashSale = false) {
   const displayPrice = isFlashSale ? Math.floor(book.price * 0.7) : book.price;
   const displayOriginal = isFlashSale ? book.price : book.originalPrice;
@@ -271,33 +272,9 @@ function updateCartUI() {
 // Make functions global for inline handlers
 window.updateCartQuantity = updateCartQuantity;
 window.removeFromCart = removeFromCart;
+window.addToCart = addToCart;
 
 // ==================== BOOK MODAL ====================
-function openBookModal(book) {
-  selectedBook = book;
-  currentQty = 1;
-  
-  document.getElementById('book-detail-image').src = book.image;
-  document.getElementById('book-detail-badge').textContent = book.badge || '';
-  document.getElementById('book-detail-badge').style.display = book.badge ? 'inline-block' : 'none';
-  document.getElementById('book-detail-name').textContent = book.name;
-  document.getElementById('book-detail-author').textContent = `Tác giả: ${book.author}`;
-  document.getElementById('book-detail-rating').textContent = book.rating;
-  document.getElementById('book-detail-reviews').textContent = book.reviews;
-  document.getElementById('book-detail-price').textContent = formatPrice(book.price);
-  document.getElementById('book-detail-original').textContent = book.originalPrice ? formatPrice(book.originalPrice) : '';
-  document.getElementById('book-detail-original').style.display = book.originalPrice ? 'inline' : 'none';
-  document.getElementById('book-detail-description').textContent = book.description || `Cuốn sách "${book.name}" của tác giả ${book.author}, thuộc thể loại ${book.category}. Đây là một cuốn sách rất đáng đọc với nội dung hấp dẫn và bổ ích.`;
-  document.getElementById('qty-input').value = 1;
-
-  document.getElementById('book-modal').classList.add('active');
-}
-
-function closeBookModal() {
-  document.getElementById('book-modal').classList.remove('active');
-  selectedBook = null;
-}
-
 function initBookModal() {
   const bookModal = document.getElementById('book-modal');
   const bookClose = document.getElementById('book-close');
@@ -329,6 +306,31 @@ function initBookModal() {
       closeBookModal();
     }
   });
+}
+
+function openBookModal(book) {
+  selectedBook = book;
+  currentQty = 1;
+  
+  document.getElementById('book-detail-image').src = book.image;
+  document.getElementById('book-detail-badge').textContent = book.badge || '';
+  document.getElementById('book-detail-badge').style.display = book.badge ? 'inline-block' : 'none';
+  document.getElementById('book-detail-name').textContent = book.name;
+  document.getElementById('book-detail-author').textContent = `Tác giả: ${book.author}`;
+  document.getElementById('book-detail-rating').textContent = book.rating;
+  document.getElementById('book-detail-reviews').textContent = book.reviews;
+  document.getElementById('book-detail-price').textContent = formatPrice(book.price);
+  document.getElementById('book-detail-original').textContent = book.originalPrice ? formatPrice(book.originalPrice) : '';
+  document.getElementById('book-detail-original').style.display = book.originalPrice ? 'inline' : 'none';
+  document.getElementById('book-detail-description').textContent = book.description || `Cuốn sách "${book.name}" của tác giả ${book.author}, thuộc thể loại ${book.category}. Đây là một cuốn sách rất đáng đọc với nội dung hấp dẫn và bổ ích.`;
+  document.getElementById('qty-input').value = 1;
+
+  document.getElementById('book-modal').classList.add('active');
+}
+
+function closeBookModal() {
+  document.getElementById('book-modal').classList.remove('active');
+  selectedBook = null;
 }
 
 // ==================== AUTH MODAL ====================
