@@ -58,6 +58,7 @@ function generateId() {
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
+  if (!text) return '';
   const map = {
     '&': '&amp;',
     '<': '<',
@@ -65,7 +66,7 @@ function escapeHtml(text) {
     '"': '"',
     "'": '&#039;'
   };
-  return text.replace(/[&<>"']/g, m => map[m]);
+  return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
 // Calculate discount percentage
@@ -93,4 +94,3 @@ if (typeof module !== 'undefined' && module.exports) {
     truncateText
   };
 }
-
