@@ -1,8 +1,10 @@
 // ==================== HERO CAROUSEL COMPONENT ====================
 
+// No import - use global heroSlides from data.js
 class HeroCarousel {
   constructor(containerId, options = {}) {
     this.container = document.getElementById(containerId);
+    this.heroSlidesData = window.heroSlides;
     this.slides = [];
     this.currentIndex = 0;
     this.autoPlay = options.autoPlay !== false;
@@ -10,8 +12,30 @@ class HeroCarousel {
     this.intervalId = null;
     
     if (this.container) {
+      this.populateSlides();
       this.init();
     }
+  }
+
+  populateSlides() {
+    this.container.innerHTML = '';
+    this.heroSlidesData.forEach((slideData, index) => {
+      const slide = document.createElement('div');
+      slide.className = `hero-slide ${slideData.gradient} ${index === 0 ? 'active' : ''}`;
+      slide.innerHTML = `
+        <div class="hero-slide-bg">
+          <img src="${slideData.image}" alt="Banner" loading="lazy">
+          <div class="gradient-overlay"></div>
+        </div>
+        <div class="hero-content">
+          <span class="hero-badge">${slideData.badge}</span>
+          <h2>${slideData.title}</h2>
+          <p>${slideData.description}</p>
+          <button class="hero-btn">${slideData.buttonText} <i class="fas fa-arrow-right"></i></button>
+        </div>
+      `;
+      this.container.appendChild(slide);
+    });
   }
 
   init() {
@@ -97,8 +121,16 @@ class HeroCarousel {
   }
 }
 
-// Export
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { HeroCarousel };
+// Global init function
+function initHeroCarousel() {
+  return new HeroCarousel('hero-slider');
 }
+
+// Export for app.js
+window.initHeroCarousel = initHeroCarousel;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { HeroCarousel, initHeroCarousel };
+}
+
 

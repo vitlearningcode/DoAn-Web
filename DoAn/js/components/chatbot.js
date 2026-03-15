@@ -522,8 +522,8 @@ class Chatbot {
 // Create global instance
 const chatbot = new Chatbot();
 
-// Export
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { Chatbot, chatbot };
-}
+// // Export
+// if (typeof module !== 'undefined' && module.exports) {
+//   module.exports = { Chatbot, chatbot };
+// }
 

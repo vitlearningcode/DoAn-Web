@@ -110,21 +110,21 @@ class BookCard {
   }
 
   onQuickAdd(id) {
-    const book = window.booksData.find(b => b.id === id);
+    const book = window.featuredBooks?.find(b => b.id === id) || window.newReleases?.find(b => b.id === id) || window.booksData?.find(b => b.id === id);
     if (book) {
       this.onAddToCart(book);
     }
   }
 
   onAdd(id) {
-    const book = window.booksData.find(b => b.id === id);
+    const book = window.featuredBooks?.find(b => b.id === id) || window.newReleases?.find(b => b.id === id) || window.booksData?.find(b => b.id === id);
     if (book) {
       this.onAddToCart(book);
     }
   }
 
   onQuickView(id) {
-    const book = window.booksData.find(b => b.id === id);
+    const book = window.featuredBooks?.find(b => b.id === id) || window.newReleases?.find(b => b.id === id) || window.booksData?.find(b => b.id === id);
     if (book) {
       this.onQuickView(book);
     }
