@@ -9,6 +9,9 @@
 /* Books and cards */
 @import url('books.css');
 
+/* Cart drawer */
+@import url('cart.css');
+
 /* Admin dashboard */
 @import url('admin.css');
 

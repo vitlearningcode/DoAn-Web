@@ -112,36 +112,48 @@ class CartDrawer {
   }
 
   updateUI() {
-    // Update count
+    // Update count badge in header
     if (this.elements.countElement) {
       const count = this.getTotalItems();
       this.elements.countElement.textContent = count;
       this.elements.countElement.classList.toggle('hidden', count === 0);
     }
 
-    // Update total
+    // Update totals in footer
     if (this.elements.totalElement) {
       this.elements.totalElement.textContent = formatPrice(this.getTotalPrice());
     }
 
-    // Update items
+    // Update items list
     if (this.elements.itemsContainer) {
       if (this.items.length === 0) {
-        this.elements.itemsContainer.innerHTML = '<p class="cart-empty">Giỏ hàng trống</p>';
+        this.elements.itemsContainer.innerHTML = `
+          <div class="empty-cart">
+            <i class="fas fa-shopping-bag" style="font-size: 64px; opacity: 0.2;"></i>
+            <p style="font-size: 18px; font-weight: 500; color: var(--gray-400);">Giỏ hàng trống</p>
+            <button onclick="cartDrawer.close()" class="btn-secondary" style="margin-top: 16px;">Tiếp tục mua sắm</button>
+          </div>
+        `;
       } else {
         this.elements.itemsContainer.innerHTML = this.items.map(item => `
-          <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}">
+          <div class="cart-item" data-id="${item.id}">
+            <div class="cart-item-image">
+              <img src="${item.image}" alt="${item.name}" loading="lazy">
+            </div>
             <div class="cart-item-info">
-              <h4 class="cart-item-name">${item.name}</h4>
-              <p class="cart-item-price">${formatPrice(item.price)}</p>
-              <div class="cart-item-qty">
-                <button onclick="cartDrawer.updateQuantity('${item.id}', -1)">-</button>
-                <span>${item.quantity}</span>
-                <button onclick="cartDrawer.updateQuantity('${item.id}', 1)">+</button>
+              <h4>${item.name}</h4>
+              <p class="book-author">${item.author}</p>
+              <div class="book-price">
+                <span>${formatPrice(item.price)}</span>
+                ${item.originalPrice ? `<span class="original-price">${formatPrice(item.originalPrice)}</span>` : ''}
+              </div>
+              <div class="cart-qty">
+                <button class="qty-btn" onclick="cartDrawer.updateQuantity('${item.id}', -1)">-</button>
+                <span class="qty-display">${item.quantity}</span>
+                <button class="qty-btn" onclick="cartDrawer.updateQuantity('${item.id}', 1)">+</button>
               </div>
             </div>
-            <button class="cart-item-remove" onclick="cartDrawer.removeItem('${item.id}')">
+            <button class="cart-item-remove" onclick="cartDrawer.removeItem('${item.id}')" title="Xóa">
               <i class="fas fa-trash"></i>
             </button>
           </div>

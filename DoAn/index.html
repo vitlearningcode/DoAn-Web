@@ -31,13 +31,12 @@
       </div>
 
       <!-- Header -->
-      <header class="header">
+     <header class="header">
         <div class="container">
           <div class="header-content">
-            <!-- Logo -->
             <div class="logo">
               <div class="logo-icon">
-                <i class="fas fa-book"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
               </div>
               <div class="logo-text">
                 <h1>BOOK SALES</h1>
@@ -45,30 +44,31 @@
               </div>
             </div>
 
-            <!-- Search -->
             <div class="search-box">
               <input type="text" placeholder="Tìm kiếm tựa sách, tác giả, nhà xuất bản...">
-              <button><i class="fas fa-search"></i></button>
+              <button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+              </button>
             </div>
 
-            <!-- Actions -->
             <div class="header-actions">
               <button class="action-btn" id="btn-login">
-                <i class="fas fa-user"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <span>Đăng nhập</span>
               </button>
               <button class="action-btn" id="btn-cart">
-                <i class="fas fa-shopping-cart"></i>
+                <div class="cart-icon-wrapper">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                  <span class="cart-count hidden" id="cart-count">0</span>
+                </div>
                 <span>Giỏ hàng</span>
-                <span class="cart-count" id="cart-count">0</span>
               </button>
             </div>
           </div>
 
-          <!-- Categories Nav -->
           <nav class="categories-nav">
             <button class="category-btn">
-              <i class="fas fa-bars"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
               Danh mục sách
             </button>
             <a href="#">Sách Mới</a>
@@ -457,6 +457,8 @@
     </div>
   </div>
 
+  <script src="js/data.js"></script>
+  <script src="js/global-data.js"></script>
   <script src="js/utils/helpers.js"></script>
   <script src="js/components/toast.js"></script>
   <script src="js/components/heroCarousel.js"></script>
