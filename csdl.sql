@@ -123,3 +123,9 @@
 - maSach(khoa ngoai)
 - maNd(khoa ngoai)
 
+20.create table KhuyenMai
+- maKM(khoa chinh)
+- tenKhuyenMai
+- giatriKM
+
+
