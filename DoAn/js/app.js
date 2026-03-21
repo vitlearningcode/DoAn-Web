@@ -103,33 +103,92 @@ function initFlashSaleTimer() {
 }
 
 // ==================== BOOKS RENDERING ====================
-function renderBooks() {
-  // Update bookCard callbacks FIRST (before renderAll)
-  bookCard.onAddToCart = (book) => {
-    cartDrawer.addItem(book, 1);
-    toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
-  };
+// function renderBooks() {
+//   // Update bookCard callbacks FIRST (before renderAll)
+//   bookCard.onAddToCart = (book) => {
+//     cartDrawer.addItem(book, 1);
+//     toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
+//   };
   
-  bookCard.onQuickView = (book) => {
-    // TODO: bookDetailsModal.open(book) if implemented
-    console.log('Quick view:', book.name);
-  };
+//   bookCard.onQuickView = (book) => {
+//     // TODO: bookDetailsModal.open(book) if implemented
+//     console.log('Quick view:', book.name);
+//   };
   
-  bookCard.onWishlist = (ids) => {
-    wishlists = new Set(ids);
-  };
+//   bookCard.onWishlist = (ids) => {
+//     wishlists = new Set(ids);
+//   };
 
-  bookCard.wishlists = wishlists;
+//   bookCard.wishlists = wishlists;
 
-  const flashBooks = window.featuredBooks.slice(0, 5).map(book => ({...book, badge: 'Flash Sale', originalPrice: book.price * 1.5 }));
-  const featuredBooks = window.featuredBooks;
-  const newReleasesBooks = window.newReleases;
+//   const flashBooks = window.featuredBooks.slice(0, 5).map(book => ({...book, badge: 'Flash Sale', originalPrice: book.price * 1.5 }));
+//   const featuredBooks = window.featuredBooks;
+//   const newReleasesBooks = window.newReleases;
 
-  bookCard.renderAll(flashBooks, 'flash-sale-books', { isFlashSale: true });
-  bookCard.renderAll(featuredBooks, 'featured-books', {});
-  bookCard.renderAll(newReleasesBooks, 'new-releases', {});
+//   bookCard.renderAll(flashBooks, 'flash-sale-books', { isFlashSale: true });
+//   bookCard.renderAll(featuredBooks, 'featured-books', {});
+//   bookCard.renderAll(newReleasesBooks, 'new-releases', {});
   
-  console.log('✅ Books rendered:', flashBooks.length, 'flash,', featuredBooks.length, 'featured,', newReleasesBooks.length, 'new');
+//   console.log('✅ Books rendered:', flashBooks.length, 'flash,', featuredBooks.length, 'featured,', newReleasesBooks.length, 'new');
+// }
+
+// ==================== BOOKS RENDERING (TỪ DATABASE) ====================
+async function renderBooks() {
+  try {
+    // 1. Gọi API để lấy danh sách sách
+    const response = await fetch('api/get_sach_filter.php');
+    const result = await response.json();
+
+    console.log("Dữ liệu từ Database:", result);
+
+    if (result.status === 200 && result.data.length > 0) {
+      const booksFromDB = result.data;
+
+      // 2. Chuyển đổi dữ liệu chuẩn xác theo SQL Schema của bạn
+      const mappedBooks = booksFromDB.map(sach => ({
+        id: sach.maSach,              // Từ bảng Sach
+        name: sach.tenSach,           // Từ bảng Sach
+        price: parseFloat(sach.giaBan), // Từ bảng Sach
+        originalPrice: parseFloat(sach.giaBan) * 1.2, // Giả lập giá gốc cao hơn 20% cho đẹp giao diện
+        // Lưu ý: urlAnh và tenTG cần được Backend JOIN từ bảng HinhAnhSach và TacGia
+        image: sach.urlAnh || 'https://picsum.photos/seed/book1/200/300', 
+        author: sach.tenTG || 'Đang cập nhật', 
+        badge: 'Sách Hot'
+      }));
+
+      // 3. Gán sự kiện cho các nút trên giao diện
+      bookCard.onAddToCart = (book) => {
+        cartDrawer.addItem(book, 1);
+        toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
+      };
+      
+      bookCard.onQuickView = (book) => {
+        console.log('Xem nhanh sách:', book.name);
+      };
+      
+      bookCard.onWishlist = (ids) => {
+        wishlists = new Set(ids);
+      };
+      bookCard.wishlists = wishlists;
+
+      // 4. Phân bổ sách lên các khu vực (Lấy tạm vài cuốn demo)
+      const flashBooks = mappedBooks.slice(0, 5).map(b => ({...b, badge: 'Flash Sale'}));
+      const featuredBooks = mappedBooks.slice(0, 8);
+      const newReleasesBooks = mappedBooks.slice(0, 10);
+
+      // Render ra giao diện
+      bookCard.renderAll(flashBooks, 'flash-sale-books', { isFlashSale: true });
+      bookCard.renderAll(featuredBooks, 'featured-books', {});
+      bookCard.renderAll(newReleasesBooks, 'new-releases', {});
+      
+      console.log('✅ Đã đổ dữ liệu từ DB lên giao diện thành công!');
+      
+    } else {
+      console.error("Không có dữ liệu hoặc lỗi API:", result.message);
+    }
+  } catch (error) {
+    console.error("Lỗi khi kết nối với API:", error);
+  }
 }
 
 // ==================== CART ====================
