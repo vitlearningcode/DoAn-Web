@@ -15,21 +15,26 @@ class Sach_DAO
         }
     }
 
-    public function getSachTheoBoLoc($mangTheLoai = [], $khoangGia = '',$sort = 'newest') 
+    public function getSachTheoBoLoc($mangTheLoai = [], $khoangGia = '', $sort = 'newest') 
     {
-        $sql = "SELECT s.maSach, s.tenSach, s.giaBan, 
-                       (SELECT urlAnh FROM HinhAnhSach WHERE maSach = s.maSach LIMIT 1) as urlAnh 
+        // 1. Dùng s.* để lấy đủ dữ liệu cho DTO
+        // 2. Dùng Subquery để lấy ảnh và ghép tên tác giả (tránh làm hỏng GROUP BY đếm Thể loại ở dưới)
+        $sql = "SELECT s.*, 
+                       (SELECT urlAnh FROM HinhAnhSach WHERE maSach = s.maSach LIMIT 1) as urlAnh,
+                       (SELECT GROUP_CONCAT(tg.tenTG SEPARATOR ', ') 
+                        FROM Sach_TacGia stg 
+                        JOIN TacGia tg ON stg.maTG = tg.maTG 
+                        WHERE stg.maSach = s.maSach) as tenTG
                 FROM Sach s ";
         
         $conditions = [];
         $params = [];
-        $havingClause = ""; // Thêm biến chứa điều kiện HAVING
+        $havingClause = ""; 
 
-        // 1. Lọc theo Thể loại (LOGIC: AND - Sách phải có TẤT CẢ các thể loại được chọn)
+        // 1. Lọc theo Thể loại (LOGIC: AND)
         if (!empty($mangTheLoai)) {
             $sql .= " JOIN Sach_TheLoai st ON s.maSach = st.maSach ";
             
-            // Vẫn dùng IN để lấy ra các dòng có chứa các thể loại được chọn
             $placeholders = implode(',', array_fill(0, count($mangTheLoai), '?'));
             $conditions[] = "st.maTL IN ($placeholders)";
             
@@ -37,14 +42,11 @@ class Sach_DAO
                 $params[] = $maTL;
             }
 
-            // ĐIỂM MẤU CHỐT LÀ ĐÂY: 
-            // Đếm số lượng mã thể loại khác nhau của cuốn sách đó.
-            // Nếu khách chọn 2 thể loại, sách đó phải có Count = 2 thì mới lấy.
             $soLuongTheLoaiYeuCau = count($mangTheLoai);
             $havingClause = " HAVING COUNT(DISTINCT st.maTL) = $soLuongTheLoaiYeuCau ";
         }
 
-        // 2. Lọc theo Giá (Giữ nguyên)
+        // 2. Lọc theo Giá
         if (!empty($khoangGia)) {
             switch ($khoangGia) {
                 case 'duoi_100': $conditions[] = "s.giaBan < 100000"; break;
@@ -61,35 +63,32 @@ class Sach_DAO
             $sql .= " WHERE " . implode(" AND ", $conditions);
         }
 
-        // Bắt buộc phải có GROUP BY
+        // Bắt buộc phải có GROUP BY cho logic lọc
         $sql .= " GROUP BY s.maSach";
 
         // Gắn HAVING vào sau GROUP BY
         if (!empty($havingClause)) {
             $sql .= $havingClause;
         }
-        if (!empty($havingClause)) {
-        $sql .= $havingClause;
-    }
 
-    // ====== THÊM LOGIC SẮP XẾP VÀO ĐÂY ======
-    switch ($sort) {
-        case 'price-asc':
-            $sql .= " ORDER BY s.giaBan ASC"; // Giá thấp đến cao
-            break;
-        case 'price-desc':
-            $sql .= " ORDER BY s.giaBan DESC"; // Giá cao đến thấp
-            break;
-        case 'newest':
-        default:
-            $sql .= " ORDER BY s.namSX DESC, s.maSach DESC"; // Mới nhất (dựa vào năm sản xuất)
-            break;
-    }
+        // ====== THÊM LOGIC SẮP XẾP VÀO ĐÂY ======
+        switch ($sort) {
+            case 'price-asc':
+                $sql .= " ORDER BY s.giaBan ASC"; // Giá thấp đến cao
+                break;
+            case 'price-desc':
+                $sql .= " ORDER BY s.giaBan DESC"; // Giá cao đến thấp
+                break;
+            case 'newest':
+            default:
+                $sql .= " ORDER BY s.namSX DESC, s.maSach DESC"; // Mới nhất (dựa vào năm sản xuất)
+                break;
+        }
 
-    // Thực thi
-    $stmt = $this->conn->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Thực thi
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
