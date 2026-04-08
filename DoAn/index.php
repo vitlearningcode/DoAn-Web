@@ -130,7 +130,7 @@ $flashSaleEndTime = $pdo->query("
 ")->fetchColumn();
 
 // ================================================================
-// THUẬT TOÁN SÁCH BÁN CHẠY — README §3 (nâng cấp)
+// THUẬT TOÁN SÁCH BÁN CHẠY
 // Lọc theo tháng hiện tại: MONTH(ngayDat) = MONTH(NOW())
 //   AND YEAR(ngayDat) = YEAR(NOW())
 // SUM(soLuong) từ đơn HoanThanh trong tháng → sort DESC → top 10
@@ -172,7 +172,7 @@ $ds_banchay = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ================================================================
-// THUẬT TOÁN SÁCH MỚI — README §4
+// THUẬT TOÁN SÁCH MỚI 
 // ORDER BY namSX DESC, maSach DESC
 // ================================================================
 $ds_sachmoi = $pdo->query("
