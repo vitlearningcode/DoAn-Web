@@ -1,105 +1,43 @@
-/* ==================== FLASH SALE ==================== */
+/* ================================================================
+   BOOKS.CSS — Vanilla CSS dịch 1:1 từ Tailwind template mẫu
+   ================================================================ */
+
+/* ==================== FLASH SALE WRAPPER ==================== */
 .flash-sale {
   margin: 48px 0;
   background: linear-gradient(to right, #f97316, #ef4444);
   padding: 4px;
   border-radius: 28px;
 }
-
-.flash-sale-inner {
-  background: white;
-  border-radius: 24px;
-  padding: 24px;
-}
-
+.flash-sale-inner { background: #fff; border-radius: 24px; padding: 24px; }
 .flash-sale-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
 }
-
-.flash-sale-title {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
+.flash-sale-title { display: flex; align-items: center; gap: 16px; }
 .flash-icon {
-  background: #fef2f2;
-  color: var(--danger);
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
+  background: #fef2f2; color: #ef4444;
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
 }
+.flash-sale-title h3 { font-size: 24px; font-weight: 700; }
+.flash-sale-title h3 span { color: #ef4444; }
+.flash-sale-title p { color: #6b7280; font-weight: 500; }
 
-.flash-sale-title h3 {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.flash-sale-title h3 span {
-  color: var(--danger);
-}
-
-.flash-sale-title p {
-  color: var(--gray-500);
-  font-weight: 500;
-}
-
-.flash-timer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.timer-block {
-  text-align: center;
-}
-
+/* Timer */
+.flash-timer { display: flex; align-items: center; gap: 8px; }
+.timer-block { text-align: center; }
 .timer-value {
-  background: var(--gray-900);
-  color: var(--white);
-  font-size: 24px;
-  font-weight: 700;
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: #111827; color: #fff;
+  font-size: 24px; font-weight: 700;
+  width: 56px; height: 56px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
-
-.timer-value.timer-seconds {
-  background: var(--danger);
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-.timer-block span {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--gray-500);
-  text-transform: uppercase;
-}
-
-.timer-sep {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--gray-400);
-  margin-bottom: 16px;
-}
+.timer-value.timer-seconds { background: #ef4444; animation: timer-pulse 1s infinite; }
+@keyframes timer-pulse { 0%,100%{opacity:1} 50%{opacity:.7} }
+.timer-block span { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+.timer-sep { font-size: 24px; font-weight: 700; color: #9ca3af; margin-bottom: 16px; }
 
 /* ==================== BOOKS GRID ==================== */
 .books-grid {
@@ -107,414 +45,300 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
+@media (min-width: 640px)  { .books-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .books-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1280px) { .books-grid { grid-template-columns: repeat(5, 1fr); } }
 
-@media (min-width: 640px) {
-  .books-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .books-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1280px) {
-  .books-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-/* Book Card */
+/* ================================================================
+   BOOK CARD — theo đúng HTML mẫu Tailwind:
+   bg-white rounded-2xl p-4 shadow-sm border hover:shadow-xl
+   hover:border-blue-200 transition-all group flex flex-col
+   ================================================================ */
 .book-card {
-  background: var(--white);
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid var(--gray-100);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
+  background: #fff;
+  border-radius: 16px;          /* rounded-2xl */
+  padding: 16px;                /* p-4 */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);   /* shadow-sm */
+  border: 1px solid #f3f4f6;   /* border border-gray-100 */
   display: flex;
   flex-direction: column;
   height: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  /* Tạo stacking context độc lập để ảnh không tràn ra ngoài */
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.25s ease;
   isolation: isolate;
 }
-
 .book-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border-color: #bfdbfe;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.13);  /* hover:shadow-xl */
+  border-color: #bfdbfe;                      /* hover:border-blue-200 */
+  transform: translateY(-4px);
 }
 
-/* ---- Vùng ảnh ---- */
+/* ====== PHẦN ẢNH: aspect-[3/4] mb-4 overflow-hidden rounded-xl ====== */
 .book-image {
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 3 / 4;
+  margin-bottom: 16px;          /* mb-4 */
   overflow: hidden;
-  background: var(--gray-50);
+  border-radius: 12px;          /* rounded-xl */
+  background: #f9fafb;          /* bg-gray-50 */
   z-index: 0;
 }
 
+/* img: w-full h-full object-cover group-hover:scale-105 */
 .book-image img {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
   display: block;
-  position: relative;
-  z-index: 1;
+  position: relative; z-index: 1;
+  transition: transform 0.5s ease;
 }
+.book-card:hover .book-image img { transform: scale(1.05); }
 
-.book-card:hover .book-image img {
-  transform: scale(1.07);
-}
-
-/* ---- Overlay (hiện khi hover) ---- */
-.book-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 5;
-}
-
-.book-card:hover .book-overlay {
-  opacity: 1;
-}
-
-/* ---- Nút icon trong overlay ---- */
-.btn-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  border: none;
-  color: var(--gray-700);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.btn-icon:hover {
-  transform: scale(1.15);
-}
-
-.btn-quick-view:hover {
-  background: var(--primary);
-  color: var(--white);
-}
-
-.btn-add-cart:hover {
-  background: var(--secondary);
-  color: var(--white);
-}
-
-/* ---- Badge (nhãn góc ảnh) ---- */
-.book-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 6;
-  color: var(--white);
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: var(--secondary);
-}
-
-.book-badge.discount {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  animation: badge-pulse 2s infinite;
-}
-
-.book-badge.hot {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-}
-
-.book-badge.new {
-  background: linear-gradient(135deg, #10b981, #059669);
-  text-transform: none;
-  font-size: 11px;
-}
-
-@keyframes badge-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-}
-
+/* ====== BADGES: absolute top-2 left-2 flex flex-col gap-1 z-10 ====== */
 .book-badges {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 6;
-}
-
-
-
-.book-quick-actions {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  opacity: 0;
-  transform: translateX(16px);
-  transition: var(--transition);
+  top: 8px; left: 8px;
+  display: flex; flex-direction: column; gap: 4px;
   z-index: 10;
 }
 
-.book-card:hover .book-quick-actions {
+/* badge chung: px-2 py-1 text-white text-[10px] font-bold rounded uppercase tracking-wider shadow-sm */
+.book-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+/* Nhãn loại: cam (Flash Sale / Mới / Bán Chạy) — bg-orange-500 */
+.book-badge.label-type { background: #f97316; }
+
+/* Nhãn giảm giá: đỏ (-XX%) — bg-red-500 */
+.book-badge.label-discount { background: #ef4444; }
+
+/* ====== RIGHT ACTIONS (top-right, ẩn khi chưa hover) ====== */
+/* absolute top-2 right-2 flex flex-col gap-2 z-10 opacity-0 translate-x-4 */
+.book-actions-right {
+  position: absolute;
+  top: 8px; right: 8px;
+  display: flex; flex-direction: column; gap: 8px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.book-card:hover .book-actions-right {
   opacity: 1;
   transform: translateX(0);
 }
 
-.book-quick-btn {
-  width: 36px;
-  height: 36px;
+/* p-2 bg-white/90 backdrop-blur-sm text-gray-500 hover:text-xxx rounded-full shadow-sm */
+.btn-action-icon {
+  width: 32px; height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255,255,255,0.92);
+  border: none;
+  color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s, background 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
   backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gray-500);
-  transition: var(--transition);
-  box-shadow: var(--shadow);
 }
+.btn-action-icon.btn-wishlist:hover { color: #ef4444; background: #fff; }
+.btn-action-icon.btn-quickview:hover { color: #2563eb; background: #fff; }
 
-.book-quick-btn:hover {
-  color: var(--primary);
-  background: var(--white);
-}
-
-.book-quick-btn.wishlist:hover {
-  color: var(--danger);
-}
-
-.book-quick-btn.wishlist.active {
-  color: var(--danger);
-}
-
-.book-quick-btn.wishlist.active i {
-  fill: var(--danger);
-}
-
-.book-quick-add {
+/* ====== BOTTOM "THÊM NHANH" (ẩn khi chưa hover) ====== */
+/* absolute bottom-0 left-0 right-0 p-3 bg-gradient opacity-0 translate-y-4 */
+.book-add-quick {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   padding: 12px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-  transform: translateY(100%);
-  transition: var(--transition);
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 5;
 }
-
-.book-card:hover .book-quick-add {
+.book-card:hover .book-add-quick {
+  opacity: 1;
   transform: translateY(0);
 }
 
-.book-quick-add button {
+/* w-full py-2 bg-blue-600 text-white text-sm font-bold rounded-lg */
+.btn-add-quick {
   width: 100%;
-  padding: 10px;
-  background: var(--primary);
-  color: var(--white);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  padding: 8px 0;
+  background: #2563eb;
+  color: #fff;
+  font-size: 13px; font-weight: 700;
+  border: none; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: background 0.2s;
 }
+.btn-add-quick:hover { background: #1d4ed8; }
 
-.book-quick-add button:hover {
-  background: var(--primary-dark);
-}
-
+/* ================================================================
+   PHẦN THÔNG TIN: flex-1 flex flex-col
+   ================================================================ */
 .book-info {
-  padding: 16px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  padding: 0;  /* padding đã nằm trên card (p-4) */
 }
 
+/* Category: text-[11px] text-blue-600 font-semibold uppercase tracking-wider mb-1.5 */
 .book-category {
   font-size: 11px;
-  color: var(--primary);
+  color: #2563eb;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
 }
 
-.book-name {
-  font-size: 14px;
+/* Title: font-bold text-gray-800 line-clamp-2 mb-1.5 group-hover:text-blue-600 leading-snug */
+.book-title {
   font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 4px;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color 0.2s;
 }
+.book-card:hover .book-title { color: #2563eb; }
 
-.book-card:hover .book-name {
-  color: var(--primary);
-}
-
+/* Author: text-xs text-gray-500 mb-2.5 line-clamp-1 */
 .book-author {
   font-size: 12px;
-  color: var(--gray-500);
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  color: #6b7280;
+  margin-bottom: 10px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+/* Rating row: flex items-center gap-1.5 mb-3.5 */
 .book-rating {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.book-rating i {
-  color: #fbbf24;
-  font-size: 14px;
-}
-
-.book-rating span {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-700);
-}
-
-.book-rating .reviews-count {
-  font-size: 11px;
-  color: var(--gray-400);
-  font-weight: 400;
-}
-
-.book-card-bottom {
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--gray-50);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.book-price {
-  display: flex;
-  flex-direction: column;
-}
-
-.current-price {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--secondary);
-}
-
-.original-price {
-  font-size: 12px;
-  color: var(--gray-400);
-  text-decoration: line-through;
-}
-
-.add-cart-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--gray-100);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-}
-
-.add-cart-btn:hover {
-  background: var(--primary);
-  color: var(--white);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
-
-/* ==================== CÁC CLASS BỔ SUNG ==================== */
-
-/* .book-title (alias của .book-name) */
-.book-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 4px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.4;
-  transition: color 0.2s;
-}
-
-.book-card:hover .book-title {
-  color: var(--primary);
-}
-
-/* Số lượng đã bán */
-.sold-count {
-  font-size: 11px;
-  color: var(--gray-400);
-  margin-top: 4px;
-}
-
-/* Số lượng review */
-.rating-count {
-  font-size: 11px;
-  color: var(--gray-400);
-  font-weight: 400;
-}
-
-/* Giá theo hàng ngang (giá flash sale) */
-.book-price {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-
-/* Flash sale: giá gốc gạch ngang được nổi bật hơn */
-.flash-sale .original-price {
+/* Star: fill-current yellow */
+.book-rating .star-icon {
+  color: #facc15;
   font-size: 13px;
 }
 
-/* Responsive: không cho book-info bị co quá nhỏ */
-.book-info {
-  padding: 12px 14px 14px;
+/* Score: text-xs font-bold text-gray-700 ml-1 */
+.book-rating .rating-score {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* Dot separator: w-1 h-1 rounded-full bg-gray-300 */
+.book-rating .rating-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #d1d5db;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Count: text-[11px] text-gray-400 */
+.book-rating .rating-count {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* ====== FOOTER: mt-auto pt-3 flex items-end justify-between border-t border-gray-50 ====== */
+.book-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f9fafb;
   display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 4px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* Price block */
+.book-price-block { display: flex; flex-direction: column; }
+
+/* Current price: font-bold text-orange-600 text-lg block leading-none mb-1 */
+.current-price {
+  font-weight: 700;
+  color: #ea580c;           /* orange-600 */
+  font-size: 17px;
+  line-height: 1;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Original price: text-xs text-gray-400 line-through */
+.original-price {
+  font-size: 12px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+/* Cart button: w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white */
+.btn-add-to-cart {
+  width: 36px; height: 36px;
+  border-radius: 10px;          /* rounded-xl */
+  background: #eff6ff;          /* bg-blue-50 */
+  color: #2563eb;               /* text-blue-600 */
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-add-to-cart:hover {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+}
+
+/* ====== NEW RELEASES — dark background ====== */
+.new-releases .book-card {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.1);
+}
+.new-releases .book-card:hover { border-color: #93c5fd; }
+.new-releases .book-title  { color: #f1f5f9; }
+.new-releases .book-card:hover .book-title { color: #93c5fd; }
+.new-releases .book-author { color: #94a3b8; }
+.new-releases .book-category { color: #93c5fd; }
+.new-releases .rating-score  { color: #e2e8f0; }
+.new-releases .rating-dot    { background: #475569; }
+.new-releases .rating-count  { color: #64748b; }
+.new-releases .current-price { color: #fb923c; }
+.new-releases .original-price{ color: #64748b; }
+.new-releases .book-footer   { border-top-color: rgba(255,255,255,0.08); }
+.new-releases .btn-add-to-cart {
+  background: rgba(219,234,254,0.12);
+  color: #93c5fd;
+}
+.new-releases .btn-add-to-cart:hover {
+  background: #2563eb;
+  color: #fff;
 }
