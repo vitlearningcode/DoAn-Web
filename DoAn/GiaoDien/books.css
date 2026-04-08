@@ -318,6 +318,36 @@
   box-shadow: 0 4px 12px rgba(37,99,235,0.3);
 }
 
+/* ====== NÚT XEM THÊM cuối section ====== */
+.section-view-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.btn-view-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  border: 2px solid #2563eb;
+  border-radius: 12px;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.btn-view-more:hover {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+}
+
 /* ====== NEW RELEASES — dark background ====== */
 .new-releases .book-card {
   background: rgba(255,255,255,0.07);

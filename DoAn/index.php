@@ -130,8 +130,11 @@ $flashSaleEndTime = $pdo->query("
 ")->fetchColumn();
 
 // ================================================================
-// THUẬT TOÁN SÁCH BÁN CHẠY — README §3
-// SUM(ChiTietDH.soLuong) WHERE DonHang.trangThai = 'HoanThanh'
+// THUẬT TOÁN SÁCH BÁN CHẠY — README §3 (nâng cấp)
+// Lọc theo tháng hiện tại: MONTH(ngayDat) = MONTH(NOW())
+//   AND YEAR(ngayDat) = YEAR(NOW())
+// SUM(soLuong) từ đơn HoanThanh trong tháng → sort DESC → top 10
+// Kèm phanTramGiam Flash Sale real-time nếu cuốn sách đang giảm giá
 // ================================================================
 $ds_banchay = $pdo->query("
     SELECT
@@ -145,15 +148,27 @@ $ds_banchay = $pdo->query("
          WHERE stl.maSach = s.maSach LIMIT 1) AS theLoai,
         (SELECT ROUND(AVG(diemDG), 1) FROM DanhGiaSach WHERE maSach = s.maSach) AS diemTB,
         (SELECT COUNT(*) FROM DanhGiaSach WHERE maSach = s.maSach) AS soReview,
+        -- Số lượng bán trong tháng hiện tại
         IFNULL((
-            SELECT SUM(ct.soLuong) FROM ChiTietDH ct
+            SELECT SUM(ct.soLuong)
+            FROM ChiTietDH ct
             JOIN DonHang dh ON dh.maDH = ct.maDH
-            WHERE ct.maSach = s.maSach AND dh.trangThai = 'HoanThanh'
-        ), 0) AS tongBan
+            WHERE ct.maSach = s.maSach
+              AND dh.trangThai = 'HoanThanh'
+              AND MONTH(dh.ngayDat) = MONTH(NOW())
+              AND YEAR(dh.ngayDat)  = YEAR(NOW())
+        ), 0) AS tongBanThang,
+        -- Giảm giá Flash Sale real-time (nếu đang trong khung giờ)
+        (SELECT ckm.phanTramGiam
+         FROM ChiTietKhuyenMai ckm
+         JOIN KhuyenMai km ON km.maKM = ckm.maKM
+         WHERE ckm.maSach = s.maSach
+           AND NOW() BETWEEN km.ngayBatDau AND km.ngayKetThuc
+         LIMIT 1) AS phanTramGiam
     FROM Sach s
     WHERE s.trangThai = 'DangKD'
-    ORDER BY tongBan DESC
-    LIMIT 8
+    ORDER BY tongBanThang DESC
+    LIMIT 10
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ================================================================
@@ -280,19 +295,27 @@ $ds_sachmoi = $pdo->query("
         <div class="section-header">
             <div>
                 <h3><i class="fas fa-fire-alt" style="color:#f97316"></i> Sách Bán Chạy Nhất</h3>
-                <p>Được độc giả lựa chọn nhiều nhất</p>
+                <p>Top 10 bán chạy nhất tháng <?= date('n/Y') ?></p>
             </div>
-            <a href="#" class="view-all-btn">Xem tất cả <i class="fas fa-chevron-right"></i></a>
+            <a href="CuaHang/TrangBanHang/danhSachSach.php" class="view-all-btn">Xem tất cả <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div class="books-grid">
+        <div class="books-grid" id="banchay-grid">
             <?php foreach ($ds_banchay as $sach):
-                /* Badge cam: "Bán Chạy" nếu đã bán được; không có badge giảm giá */
-                $badges = $sach['tongBan'] > 0
-                    ? [['class' => 'label-type', 'label' => 'Bán Chạy']]
-                    : [];
+                /*
+                 * Badges:
+                 *  1. Luôn có nhãn "Hot" màu cam
+                 *  2. Nếu đang trong Flash Sale → thêm nhãn "-XX%" màu đỏ
+                 *     và tính giaSau để hiển thị giá gạch ngang
+                 */
+                $badges = [['class' => 'label-type', 'label' => '🔥 Hot']];
+                if (!empty($sach['phanTramGiam'])) {
+                    $badges[] = ['class' => 'label-discount', 'label' => '-' . $sach['phanTramGiam'] . '%'];
+                    $sach['giaSau'] = round($sach['giaBan'] * (1 - $sach['phanTramGiam'] / 100));
+                }
                 echo renderBookCard($sach, $badges);
             endforeach; ?>
         </div>
+      
     </section>
 
     <!-- ===== SÁCH MỚI PHÁT HÀNH ===== -->
