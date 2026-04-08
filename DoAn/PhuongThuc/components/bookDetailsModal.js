@@ -1,194 +1,175 @@
-// ==================== BOOK DETAILS MODAL COMPONENT ====================
+// ==================== KHUNG POPUP CHI TIẾT SÁCH (KHÔNG DÙNG API) ====================
 
-class BookDetailsModal {
-  constructor(options = {}) {
-    this.isOpen = false;
-    this.book = null;
-    this.quantity = 1;
-    this.onAddToCart = options.onAddToCart || (() => {});
-    this.onBuyNow = options.onBuyNow || (() => {});
-    
-    this.elements = {
-      modal: null,
-      image: null,
-      name: null,
-      author: null,
-      rating: null,
-      reviews: null,
-      price: null,
-      originalPrice: null,
-      description: null,
-      badge: null,
-      discount: null,
-      qtyInput: null
+class HopThoaiChiTietSach {
+  constructor() {
+    this.dangMo = false;
+    this.sachHienTai = null; // Lưu thông tin cuốn sách đang xem
+    this.soLuong = 1;
+
+    this.thanhPhan = {
+      khungChinh: null,
+      anhBia: null,
+      tenSach: null,
+      tacGia: null,
+      giaBan: null,
+      giaGoc: null,
+      moTa: null,
+      oNhapSoLuong: null,
     };
-    
-    this.init();
+
+    // Tự động khởi tạo khi trang load xong
+    document.addEventListener("DOMContentLoaded", () => this.khoiTao());
   }
 
-  init() {
-    this.elements.modal = document.getElementById('book-modal');
-    this.elements.image = document.getElementById('book-detail-image');
-    this.elements.name = document.getElementById('book-detail-name');
-    this.elements.author = document.getElementById('book-detail-author');
-    this.elements.rating = document.getElementById('book-detail-rating');
-    this.elements.reviews = document.getElementById('book-detail-reviews');
-    this.elements.price = document.getElementById('book-detail-price');
-    this.elements.originalPrice = document.getElementById('book-detail-original');
-    this.elements.description = document.getElementById('book-detail-description');
-    this.elements.badge = document.getElementById('book-detail-badge');
-    this.elements.discount = document.getElementById('book-detail-discount');
-    this.elements.qtyInput = document.getElementById('qty-input');
-    
-    this.bindEvents();
+  khoiTao() {
+    // 1. Tìm các thẻ HTML của cái khung Popup (đã được PHP in ẩn sẵn ở cuối trang)
+    this.thanhPhan.khungChinh = document.getElementById("book-modal");
+    this.thanhPhan.anhBia = document.getElementById("book-detail-image");
+    this.thanhPhan.tenSach = document.getElementById("book-detail-name");
+    this.thanhPhan.tacGia = document.getElementById("book-detail-author");
+    this.thanhPhan.giaBan = document.getElementById("book-detail-price");
+    this.thanhPhan.giaGoc = document.getElementById("book-detail-original");
+    this.thanhPhan.moTa = document.getElementById("book-detail-description");
+    this.thanhPhan.oNhapSoLuong = document.getElementById("qty-input");
+
+    this.ganSuKien();
   }
 
-  bindEvents() {
-    const closeBtn = document.getElementById('book-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.close());
+  ganSuKien() {
+    // Nút tắt Popup (dấu X)
+    const nutDong = document.getElementById("book-close");
+    if (nutDong) {
+      nutDong.addEventListener("click", () => this.dong());
     }
-    
-    if (this.elements.modal) {
-      this.elements.modal.addEventListener('click', (e) => {
-        if (e.target === this.elements.modal) this.close();
+
+    // Bấm ra ngoài vùng đen cũng tắt Popup
+    if (this.thanhPhan.khungChinh) {
+      this.thanhPhan.khungChinh.addEventListener("click", (suKien) => {
+        if (suKien.target === this.thanhPhan.khungChinh) this.dong();
       });
     }
 
-    // Quantity controls
-    const minusBtn = document.getElementById('qty-minus');
-    const plusBtn = document.getElementById('qty-plus');
-    const addToCartBtn = document.getElementById('btn-add-to-cart');
-    
-    if (minusBtn) {
-      minusBtn.addEventListener('click', () => this.updateQuantity(-1));
-    }
-    if (plusBtn) {
-      plusBtn.addEventListener('click', () => this.updateQuantity(1));
-    }
-    if (addToCartBtn) {
-      addToCartBtn.addEventListener('click', () => this.handleAddToCart());
+    // Xử lý nút Cộng / Trừ số lượng
+    const nutTru = document.getElementById("qty-minus");
+    const nutCong = document.getElementById("qty-plus");
+
+    if (nutTru) nutTru.addEventListener("click", () => this.capNhatSoLuong(-1));
+    if (nutCong)
+      nutCong.addEventListener("click", () => this.capNhatSoLuong(1));
+
+    // Xử lý nút "Thêm vào giỏ" ở trong Popup
+    const nutThemVaoGio = document.getElementById("btn-add-to-cart");
+    if (nutThemVaoGio) {
+      nutThemVaoGio.addEventListener("click", () => this.themVaoGioHang());
     }
 
-    // ESC key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.isOpen) {
-        this.close();
-      }
+    // Bấm nút Esc để đóng
+    document.addEventListener("keydown", (suKien) => {
+      if (suKien.key === "Escape" && this.dangMo) this.dong();
     });
   }
 
-  open(book) {
-    this.book = book;
-    this.quantity = 1;
-    this.updateUI();
-    this.isOpen = true;
-    this.elements.modal?.classList.add('active');
-    document.body.style.overflow = 'hidden';
+  // HÀM NÀY QUAN TRỌNG: Gọi khi bấm nút "Xem nhanh"
+  mo(nutBam) {
+    // 1. Móc toàn bộ dữ liệu đang giấu trong cái Nút Bấm ra
+    this.sachHienTai = {
+      id: nutBam.getAttribute("data-id"),
+      ten: nutBam.getAttribute("data-tensach"),
+      gia: nutBam.getAttribute("data-giaban"),
+      giaGoc: nutBam.getAttribute("data-giagoc") || "",
+      anh: nutBam.getAttribute("data-hinhanh"),
+      tacGia: nutBam.getAttribute("data-tacgia") || "Đang cập nhật",
+      moTa:
+        nutBam.getAttribute("data-mota") || "Chưa có mô tả cho cuốn sách này.",
+    };
+
+    this.soLuong = 1;
+
+    // 2. Bơm dữ liệu vào khung Popup
+    this.capNhatGiaoDien();
+
+    // 3. Hiển thị Popup lên
+    this.dangMo = true;
+    this.thanhPhan.khungChinh?.classList.add("active");
+    document.body.style.overflow = "hidden"; // Chống cuộn trang
   }
 
-  close() {
-    this.isOpen = false;
-    this.elements.modal?.classList.remove('active');
-    document.body.style.overflow = '';
-    this.book = null;
+  dong() {
+    this.dangMo = false;
+    this.thanhPhan.khungChinh?.classList.remove("active");
+    document.body.style.overflow = "";
+    this.sachHienTai = null;
   }
 
-  updateUI() {
-    if (!this.book) return;
+  capNhatGiaoDien() {
+    if (!this.sachHienTai) return;
 
-    // Image
-    if (this.elements.image) {
-      this.elements.image.src = this.book.image;
-      this.elements.image.alt = this.book.name;
+    // Thay thế hình ảnh, chữ nghĩa trong Popup bằng dữ liệu vừa móc được
+    if (this.thanhPhan.anhBia) {
+      this.thanhPhan.anhBia.src = this.sachHienTai.anh;
+      this.thanhPhan.anhBia.alt = this.sachHienTai.ten;
+    }
+    if (this.thanhPhan.tenSach)
+      this.thanhPhan.tenSach.textContent = this.sachHienTai.ten;
+    if (this.thanhPhan.tacGia)
+      this.thanhPhan.tacGia.textContent = `Tác giả: ${this.sachHienTai.tacGia}`;
+    if (this.thanhPhan.moTa)
+      this.thanhPhan.moTa.textContent = this.sachHienTai.moTa;
+
+    // Dùng hàm định dạng tiền từ utils.js
+    if (this.thanhPhan.giaBan && typeof dinhDangTien !== "undefined") {
+      this.thanhPhan.giaBan.textContent = dinhDangTien(this.sachHienTai.gia);
     }
 
-    // Badges
-    if (this.elements.badge) {
-      if (this.book.badge) {
-        this.elements.badge.textContent = this.book.badge;
-        this.elements.badge.style.display = 'inline-block';
+    if (this.thanhPhan.giaGoc) {
+      if (this.sachHienTai.giaGoc) {
+        this.thanhPhan.giaGoc.textContent =
+          typeof dinhDangTien !== "undefined"
+            ? dinhDangTien(this.sachHienTai.giaGoc)
+            : this.sachHienTai.giaGoc;
+        this.thanhPhan.giaGoc.style.display = "inline";
       } else {
-        this.elements.badge.style.display = 'none';
+        this.thanhPhan.giaGoc.style.display = "none";
       }
     }
 
-    // Discount badge
-    if (this.elements.discount) {
-      const discount = this.book.originalPrice 
-        ? Math.round((1 - this.book.price / this.book.originalPrice) * 100) 
-        : 0;
-      if (discount > 0) {
-        this.elements.discount.textContent = `-${discount}%`;
-        this.elements.discount.style.display = 'inline-block';
+    if (this.thanhPhan.oNhapSoLuong)
+      this.thanhPhan.oNhapSoLuong.value = this.soLuong;
+  }
+
+  capNhatSoLuong(thayDoi) {
+    this.soLuong += thayDoi;
+    if (this.soLuong < 1) this.soLuong = 1;
+    if (this.soLuong > 99) this.soLuong = 99;
+    if (this.thanhPhan.oNhapSoLuong)
+      this.thanhPhan.oNhapSoLuong.value = this.soLuong;
+  }
+
+  themVaoGioHang() {
+    if (!this.sachHienTai) return;
+
+    // Định dạng lại tên biến để khớp với cái Giỏ hàng
+    const thongTinSachChuan = {
+      id: this.sachHienTai.id,
+      name: this.sachHienTai.ten,
+      price: parseFloat(this.sachHienTai.gia),
+      image: this.sachHienTai.anh,
+    };
+
+    // Truyền qua hàm Giỏ Hàng
+    if (typeof cartDrawer !== "undefined") {
+      cartDrawer.addItem(thongTinSachChuan, this.soLuong);
+      if (typeof hienThiThongBao !== "undefined") {
+        hienThiThongBao(
+          `Đã thêm ${this.soLuong} cuốn "${this.sachHienTai.ten}" vào giỏ`,
+        );
       } else {
-        this.elements.discount.style.display = 'none';
+        alert(`Đã thêm ${this.soLuong} cuốn "${this.sachHienTai.ten}" vào giỏ`);
       }
     }
-
-    // Info
-    if (this.elements.name) {
-      this.elements.name.textContent = this.book.name;
-    }
-    if (this.elements.author) {
-      this.elements.author.textContent = `Tác giả: ${this.book.author}`;
-    }
-    if (this.elements.rating) {
-      this.elements.rating.textContent = this.book.rating;
-    }
-    if (this.elements.reviews) {
-      this.elements.reviews.textContent = this.book.reviews;
-    }
-    if (this.elements.price) {
-      this.elements.price.textContent = formatPrice(this.book.price);
-    }
-    if (this.elements.originalPrice) {
-      if (this.book.originalPrice) {
-        this.elements.originalPrice.textContent = formatPrice(this.book.originalPrice);
-        this.elements.originalPrice.style.display = 'inline';
-      } else {
-        this.elements.originalPrice.style.display = 'none';
-      }
-    }
-    if (this.elements.description) {
-      this.elements.description.textContent = `Cuốn sách "${this.book.name}" của tác giả ${this.book.author}, thuộc thể loại ${this.book.category}. Đây là một cuốn sách rất đáng đọc với nội dung hấp dẫn và bổ ích.`;
-    }
-    if (this.elements.qtyInput) {
-      this.elements.qtyInput.value = this.quantity;
-    }
-  }
-
-  updateQuantity(delta) {
-    this.quantity += delta;
-    if (this.quantity < 1) this.quantity = 1;
-    if (this.quantity > 99) this.quantity = 99;
-    if (this.elements.qtyInput) {
-      this.elements.qtyInput.value = this.quantity;
-    }
-  }
-
-  handleAddToCart() {
-    if (!this.book) return;
-    this.onAddToCart(this.book, this.quantity);
-    this.close();
-  }
-
-  handleBuyNow() {
-    if (!this.book) return;
-    this.onBuyNow(this.book, this.quantity);
+    this.dong();
   }
 }
 
-// Create global instance
-const bookDetailsModal = new BookDetailsModal({
-  onAddToCart: (book, quantity) => {
-    cartDrawer.addItem(book, quantity);
-    toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
-  }
-});
-
-// Export
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { BookDetailsModal, bookDetailsModal };
-}
-
+// Khởi tạo đối tượng toàn cục
+const hopThoaiChiTietSach = new HopThoaiChiTietSach();

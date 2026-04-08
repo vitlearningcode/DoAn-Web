@@ -1,103 +1,207 @@
-// ==================== CART COMPONENT ====================
+// ==================== HỆ THỐNG GIỎ HÀNG (LƯU TRỮ CỤC BỘ) ====================
 
-// Cart state
-let cartItems = [];
+// Khởi tạo mảng giỏ hàng từ LocalStorage (Để F5 không bị mất)
+let danhSachGioHang = JSON.parse(localStorage.getItem("gioHang_BookSM")) || [];
 
-// Initialize cart functionality
-function initCart() {
-  const cartBtn = document.getElementById('btn-cart');
-  const cartDrawer = document.getElementById('cart-drawer');
-  const cartOverlay = document.getElementById('cart-overlay');
-  const cartClose = document.getElementById('cart-close');
+// 1. Hàm khởi tạo các sự kiện đóng/mở ngăn kéo giỏ hàng
+function khoiTaoGioHang() {
+  const nutMoGio = document.getElementById("btn-cart");
+  const nganKeoGio = document.getElementById("cart-drawer");
+  const lopPhuDen = document.getElementById("cart-overlay");
+  const nutDongGio = document.getElementById("cart-close");
 
-  cartBtn.addEventListener('click', () => {
-    cartDrawer.classList.add('active');
-    cartOverlay.classList.add('active');
-  });
+  if (nutMoGio && nganKeoGio && lopPhuDen) {
+    nutMoGio.addEventListener("click", () => {
+      // RÀO CHẮN: Phải đăng nhập mới cho mở xem giỏ hàng
+      if (typeof dangDangNhap === "undefined" || !dangDangNhap) {
+        if (typeof hienThiThongBao !== "undefined") {
+          hienThiThongBao("Vui lòng đăng nhập để xem giỏ hàng!");
+        } else {
+          alert("Vui lòng đăng nhập để xem giỏ hàng!");
+        }
 
-  const closeCart = () => {
-    cartDrawer.classList.remove('active');
-    cartOverlay.classList.remove('active');
-  };
+        if (typeof authModal !== "undefined") authModal.mo("dang_nhap");
+        return;
+      }
 
-  cartClose.addEventListener('click', closeCart);
-  cartOverlay.addEventListener('click', closeCart);
-}
+      nganKeoGio.classList.add("active");
+      lopPhuDen.classList.add("active");
+    });
 
-// Add item to cart
-function addToCart(book, quantity = 1) {
-  const existing = cartItems.find(item => item.id === book.id);
-  if (existing) {
-    existing.quantity += quantity;
-  } else {
-    cartItems.push({ ...book, quantity });
+    const dongGioHang = () => {
+      nganKeoGio.classList.remove("active");
+      lopPhuDen.classList.remove("active");
+    };
+
+    if (nutDongGio) nutDongGio.addEventListener("click", dongGioHang);
+    lopPhuDen.addEventListener("click", dongGioHang);
   }
-  updateCartUI();
-  showToast(`Đã thêm "${book.name}" vào giỏ hàng`);
+
+  // Tự động cập nhật giao diện ngay khi load trang
+  capNhatGiaoDienGioHang();
 }
 
-// Remove item from cart
-function removeFromCart(id) {
-  cartItems = cartItems.filter(item => item.id !== id);
-  updateCartUI();
+// 2. Hàm thêm sách vào giỏ
+function themSachVaoGio(sach, soLuong = 1) {
+  // Rào chắn bảo mật lớp 2 phòng hờ gọi từ chỗ khác
+  if (typeof dangDangNhap === "undefined" || !dangDangNhap) {
+    if (typeof authModal !== "undefined") authModal.mo("dang_nhap");
+    return;
+  }
+
+  // Tìm xem sách này đã có trong giỏ chưa
+  const sachDaCo = danhSachGioHang.find((monHang) => monHang.id === sach.id);
+
+  if (sachDaCo) {
+    sachDaCo.quantity += soLuong;
+  } else {
+    // Đẩy dữ liệu sách mới vào mảng
+    danhSachGioHang.push({
+      id: sach.id,
+      name: sach.name,
+      price: sach.price,
+      image: sach.image,
+      quantity: soLuong,
+    });
+  }
+
+  LuuVaoBoNhoGhiNho();
+  capNhatGiaoDienGioHang();
 }
 
-// Update cart item quantity
-function updateCartQuantity(id, delta) {
-  const item = cartItems.find(item => item.id === id);
-  if (item) {
-    item.quantity += delta;
-    if (item.quantity < 1) {
-      removeFromCart(id);
+// 3. Hàm xóa 1 cuốn sách khỏi giỏ
+function xoaKhoiGio(maSach) {
+  danhSachGioHang = danhSachGioHang.filter((monHang) => monHang.id !== maSach);
+  LuuVaoBoNhoGhiNho();
+  capNhatGiaoDienGioHang();
+}
+
+// 4. Hàm tăng/giảm số lượng
+function thayDoiSoLuongTrongGio(maSach, thayDoi) {
+  const sachCuaToi = danhSachGioHang.find((monHang) => monHang.id === maSach);
+
+  if (sachCuaToi) {
+    sachCuaToi.quantity += thayDoi;
+
+    // Nếu giảm về 0 thì xóa luôn
+    if (sachCuaToi.quantity < 1) {
+      xoaKhoiGio(maSach);
     } else {
-      updateCartUI();
+      LuuVaoBoNhoGhiNho();
+      capNhatGiaoDienGioHang();
     }
   }
 }
 
-// Update cart UI
-function updateCartUI() {
-  const cartCount = document.getElementById('cart-count');
-  const cartItemsContainer = document.getElementById('cart-items');
-  const cartTotal = document.getElementById('cart-total');
+// 5. Hàm lưu tạm vào trình duyệt
+function LuuVaoBoNhoGhiNho() {
+  localStorage.setItem("gioHang_BookSM", JSON.stringify(danhSachGioHang));
+}
 
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+// 6. Hàm cập nhật lại cục HTML của Giỏ hàng
+function capNhatGiaoDienGioHang() {
+  const theDemSoLuong = document.getElementById("cart-count");
+  const khuVucChuaHang = document.getElementById("cart-items");
+  const theTongTien = document.getElementById("cart-total");
 
-  cartCount.textContent = totalItems;
-  cartCount.classList.toggle('hidden', totalItems === 0);
-  cartTotal.textContent = formatPrice(totalPrice);
+  if (!khuVucChuaHang) return;
 
-  if (cartItems.length === 0) {
-    cartItemsContainer.innerHTML = '<p class="cart-empty">Giỏ hàng trống</p>';
+  // Nếu chưa đăng nhập, clear hiển thị và thoát luôn
+  if (typeof dangDangNhap === "undefined" || !dangDangNhap) {
+    if (theDemSoLuong) {
+      theDemSoLuong.textContent = 0;
+      theDemSoLuong.classList.add("hidden");
+    }
+    khuVucChuaHang.innerHTML =
+      '<p class="cart-empty">Vui lòng đăng nhập để sử dụng giỏ hàng</p>';
+    if (theTongTien) theTongTien.textContent = "0đ";
+    return;
+  }
+
+  // Tính tổng
+  const tongSoCuon = danhSachGioHang.reduce(
+    (tong, monHang) => tong + monHang.quantity,
+    0,
+  );
+  const tongTien = danhSachGioHang.reduce(
+    (tong, monHang) => tong + monHang.price * monHang.quantity,
+    0,
+  );
+
+  // Cập nhật số nhỏ góc trên
+  if (theDemSoLuong) {
+    theDemSoLuong.textContent = tongSoCuon;
+    theDemSoLuong.classList.toggle("hidden", tongSoCuon === 0);
+  }
+
+  // Cập nhật tổng tiền (Dùng hàm dinhDangTien từ utils.js)
+  if (theTongTien) {
+    theTongTien.textContent =
+      typeof dinhDangTien !== "undefined"
+        ? dinhDangTien(tongTien)
+        : tongTien + "đ";
+  }
+
+  // Vẽ danh sách sách trong ngăn kéo
+  if (danhSachGioHang.length === 0) {
+    khuVucChuaHang.innerHTML = '<p class="cart-empty">Giỏ hàng trống</p>';
   } else {
-    cartItemsContainer.innerHTML = cartItems.map(item => `
-      <div class="cart-item">
-        <img src="${item.image}" alt="${item.name}">
-        <div class="cart-item-info">
-          <h4 class="cart-item-name">${item.name}</h4>
-          <p class="cart-item-price">${formatPrice(item.price)}</p>
-          <div class="cart-item-qty">
-            <button onclick="updateCartQuantity('${item.id}', -1)">-</button>
-            <span>${item.quantity}</span>
-            <button onclick="updateCartQuantity('${item.id}', 1)">+</button>
+    let html = "";
+    danhSachGioHang.forEach((monHang) => {
+      let giaFormat =
+        typeof dinhDangTien !== "undefined"
+          ? dinhDangTien(monHang.price)
+          : monHang.price;
+
+      html += `
+          <div class="cart-item">
+            <img src="${monHang.image}" alt="${monHang.name}">
+            <div class="cart-item-info">
+              <h4 class="cart-item-name">${monHang.name}</h4>
+              <p class="cart-item-price">${giaFormat}</p>
+              <div class="cart-item-qty">
+                <button onclick="thayDoiSoLuongTrongGio('${monHang.id}', -1)">-</button>
+                <span>${monHang.quantity}</span>
+                <button onclick="thayDoiSoLuongTrongGio('${monHang.id}', 1)">+</button>
+              </div>
+            </div>
+            <button class="cart-item-remove" onclick="xoaKhoiGio('${monHang.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
-        </div>
-        <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    `).join('');
+        `;
+    });
+    khuVucChuaHang.innerHTML = html;
   }
 }
 
-// Make functions global for inline handlers
-window.updateCartQuantity = updateCartQuantity;
-window.removeFromCart = removeFromCart;
-window.addToCart = addToCart;
+// ==================== KẾT NỐI VỚI NÚT THANH TOÁN ====================
+document.addEventListener("DOMContentLoaded", () => {
+  khoiTaoGioHang();
 
-// Export
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { initCart, addToCart, removeFromCart, updateCartQuantity, updateCartUI, cartItems };
-}
+  // Xử lý khi nhấn nút Thanh Toán
+  const nutThanhToan = document.querySelector(".checkout-btn");
+  if (nutThanhToan) {
+    nutThanhToan.addEventListener("click", () => {
+      if (danhSachGioHang.length === 0) {
+        alert("Giỏ hàng của bạn đang trống!");
+        return;
+      }
 
+      // Chuyển hướng sang trang Thanh Toán của PHP
+      window.location.href = "ChucNang/CuaHang/ThanhToan/index.php";
+    });
+  }
+});
+
+// Gắn hàm vào window để các nút gọi được (từ các thuộc tính onclick)
+window.thayDoiSoLuongTrongGio = thayDoiSoLuongTrongGio;
+window.xoaKhoiGio = xoaKhoiGio;
+window.themSachVaoGio = themSachVaoGio;
+
+// Alias (ánh xạ) lại tên đối tượng cũ để app.js không bị sập
+const cartDrawer = {
+  addItem: themSachVaoGio,
+  toggle: () => document.getElementById("btn-cart")?.click(),
+};
+window.cartDrawer = cartDrawer;

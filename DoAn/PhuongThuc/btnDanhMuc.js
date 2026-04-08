@@ -4,205 +4,88 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   // ---------------------------------------------------------
-  // 1. LOGIC CHUYỂN ĐỔI GIAO DIỆN (Trang chủ <-> Danh mục)
+  // 1. LOGIC CHUYỂN ĐỔI GIAO DIỆN (Nút Danh Mục)
   // ---------------------------------------------------------
-  const btnDanhMuc = document.querySelector(".category-btn");
-  const logoTrangChu = document.querySelector(".logo");
-  const homeContent = document.getElementById("home-content");
-  const categoryPage = document.getElementById("category-page");
+  const nutDanhMuc = document.querySelector(".category-btn");
 
-  if (btnDanhMuc) {
-    btnDanhMuc.addEventListener("click", (e) => {
-      e.preventDefault();
-      homeContent.style.display = "none";
-      categoryPage.style.display = "block";
+  if (nutDanhMuc) {
+    nutDanhMuc.addEventListener("click", (suKien) => {
+      suKien.preventDefault();
 
-      // Lần đầu bấm vào thì gọi API load thể loại và load tất cả sách
-      if (
-        document
-          .getElementById("theloai-filter-list")
-          .innerHTML.includes("Đang tải")
-      ) {
-        loadTheLoaiFilter();
-      }
-      filterBooks();
-    });
-  }
-
-  if (logoTrangChu) {
-    logoTrangChu.addEventListener("click", () => {
-      homeContent.style.display = "block";
-      categoryPage.style.display = "none";
+      // THAY ĐỔI LỚN: Thay vì ẩn/hiện div bằng JS, ta chuyển hướng thẳng sang trang Lọc Sách của PHP
+      // (Giả sử ông để trang lọc sách ở thư mục này)
+      window.location.href = "ChucNang/CuaHang/LocSach/index.php";
     });
   }
 
   // ---------------------------------------------------------
-  // 2. GỌI API LẤY DANH SÁCH THỂ LOẠI (Checkbox)
+  // 2. LẮNG NGHE SỰ KIỆN LỌC SÁCH (BÊN TRANG LỌC SÁCH)
   // ---------------------------------------------------------
-  async function loadTheLoaiFilter() {
-    try {
-      const response = await fetch("./api/get_theloai.php");
-      const res = await response.json();
 
-      if (res.status === 200) {
-        const container = document.getElementById("theloai-filter-list");
-        if (!container) return;
-
-        let html = "";
-        res.data.forEach((tl) => {
-          html += `
-                        <label class="filter-pill-label">
-                            <input type="checkbox" name="theloai" value="${tl.maTL}">
-                            <span>${tl.tenTL}</span>
-                        </label>
-                    `;
-        });
-        container.innerHTML = html;
-      }
-    } catch (error) {
-      console.error("Lỗi khi load thể loại:", error);
-    }
-  }
-
-  // ---------------------------------------------------------
-  // 3. GỌI API LỌC SÁCH ĐỘNG (Theo Thể loại, Giá & Sắp xếp)
-  // ---------------------------------------------------------
-  async function filterBooks() {
+  // Hàm thu thập thông số và chuyển hướng trang (Gửi Request cho PHP)
+  function thucHienLocSach() {
     // 1. Lấy mảng thể loại đang tick
-    const theLoaiCheckboxes = document.querySelectorAll(
+    const danhSachTheLoaiDaChon = document.querySelectorAll(
       'input[name="theloai"]:checked',
     );
-    let mangTheLoai = Array.from(theLoaiCheckboxes).map((cb) => cb.value);
+    let mangTheLoai = Array.from(danhSachTheLoaiDaChon).map(
+      (checkbox) => checkbox.value,
+    );
 
-    // 2. Lấy giá trị Radio (Giá) đang chọn
-    const giaRadio = document.querySelector('input[name="giatien"]:checked');
-    let khoangGia = giaRadio ? giaRadio.value : "";
+    // 2. Lấy giá trị Radio (Khoảng giá) đang chọn
+    const theGiaDaChon = document.querySelector(
+      'input[name="giatien"]:checked',
+    );
+    let khoangGia = theGiaDaChon ? theGiaDaChon.value : "";
 
     // 3. Lấy giá trị Sắp xếp đang được chọn
-    const sortSelect = document.getElementById("sort-select");
-    let sortValue = sortSelect ? sortSelect.value : "newest";
+    const hopSapXep = document.getElementById("sort-select");
+    let kieuSapXep = hopSapXep ? hopSapXep.value : "newest";
 
-    // 4. Xây dựng đường dẫn URL gọi API (Gộp tất cả vào đây)
-    let url = `./api/get_sach_filter.php?`;
-    if (mangTheLoai.length > 0) url += `theloai=${mangTheLoai.join(",")}&`;
-    if (khoangGia) url += `gia=${khoangGia}&`;
-    url += `sort=${sortValue}`; // Gắn tham số sort vào cuối cùng
+    // 4. Xây dựng đường dẫn URL truyền tham số (GET Request)
+    // File PHP hiện tại sẽ nhận các tham số này trên thanh địa chỉ
+    let duongDan = window.location.pathname + "?";
 
-    // 5. Gọi API
-    try {
-            const response = await fetch(url);
-            const res = await response.json();
-            const container = document.getElementById('book-list-container');
-            
-            if (res.status === 200) {
-                // DÒNG NÀY RẤT QUAN TRỌNG: Lưu dữ liệu để file btnThemGiohang.js có thể lấy xài
-                window.currentFilteredBooks = res.data; 
-
-                let html = '';
-        res.data.forEach((sach) => {
-          let giaFormat = new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(sach.giaBan);
-
-          // 1. Thêm data-* vào thẻ div ngoài cùng để cất giấu dữ liệu
-          html += `
-                      <div class="book-card" 
-                           data-id="${sach.maSach}" 
-                           data-name="${sach.tenSach}" 
-                           data-price="${sach.giaBan}" 
-                           data-image="${sach.urlAnh || "https://picsum.photos/200/300"}">
-                           
-                        <div class="book-image">
-                          <img src="${sach.urlAnh || "https://picsum.photos/200/300"}" alt="${sach.tenSach}" referrerPolicy="no-referrer">
-                          
-                          <div class="book-quick-actions">
-                            <button class="book-quick-btn wishlist" title="Yêu thích">
-                              <i class="far fa-heart"></i>
-                            </button>
-                            <button class="book-quick-btn" title="Xem nhanh">
-                              <i class="fas fa-eye"></i>
-                            </button>
-                          </div>
-
-                          <div class="book-quick-add">
-                            <button onclick="event.stopPropagation(); addToCart(this)">
-                              <i class="fas fa-shopping-cart"></i> Thêm Nhanh
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div class="book-info">
-                          <span class="book-category">Thể loại</span>
-                          <h3 class="book-name">${sach.tenSach}</h3>
-                          <p class="book-author">Đang cập nhật</p>
-                          <div class="book-rating">
-                            <i class="fas fa-star"></i>
-                            <span>5.0</span>
-                            <span class="reviews-count">(0)</span>
-                          </div>
-                          
-                          <div class="book-card-bottom">
-                            <div class="book-price">
-                              <span class="current-price">${giaFormat}</span>
-                            </div>
-                            <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(this)">
-                              <i class="fas fa-shopping-cart"></i>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    `;
-        });
-        container.innerHTML = html;
-      } else {
-        container.innerHTML = `<p style="text-align:center; width:100%; color:#888;">${res.message}</p>`;
-      }
-    } catch (error) {
-      console.error("Lỗi khi lọc sách:", error);
+    if (mangTheLoai.length > 0) {
+      duongDan += `theloai=${mangTheLoai.join(",")}&`;
     }
+    if (khoangGia) {
+      duongDan += `gia=${khoangGia}&`;
+    }
+    duongDan += `sort=${kieuSapXep}`;
+
+    // 5. Tải lại trang với đường dẫn mới để PHP làm việc
+    window.location.href = duongDan;
   }
 
-  // ---------------------------------------------------------
-  // 4. LẮNG NGHE SỰ KIỆN LỌC & NÚT RESET
-  // ---------------------------------------------------------
-
-  // Lắng nghe sự kiện khi người dùng đổi kiểu sắp xếp
-  const sortSelectBox = document.getElementById("sort-select");
-  if (sortSelectBox) {
-    sortSelectBox.addEventListener("change", () => {
-      filterBooks(); // Gọi lại hàm lọc sách
+  // Lắng nghe thay đổi kiểu sắp xếp
+  const hopSapXep = document.getElementById("sort-select");
+  if (hopSapXep) {
+    hopSapXep.addEventListener("change", () => {
+      thucHienLocSach();
     });
   }
 
-  // Lắng nghe sự kiện tick Thể loại / Giá tiền
-  const sidebar = document.getElementById("filter-sidebar");
-  if (sidebar) {
-    sidebar.addEventListener("change", (e) => {
-      if (e.target.tagName === "INPUT") {
-        filterBooks();
+  // Lắng nghe thay đổi tick Thể loại / Giá tiền ở thanh Sidebar
+  const thanhBoLoc = document.getElementById("filter-sidebar");
+  if (thanhBoLoc) {
+    thanhBoLoc.addEventListener("change", (suKien) => {
+      // Nếu phần tử vừa thay đổi là input (checkbox/radio) thì gọi hàm lọc
+      if (suKien.target.tagName === "INPUT") {
+        thucHienLocSach();
       }
     });
   }
 
-  // Nút Bỏ chọn tất cả
-  const btnReset = document.getElementById("btn-reset-filter");
-  if (btnReset) {
-    btnReset.addEventListener("click", () => {
-      document
-        .querySelectorAll('input[name="theloai"]')
-        .forEach((cb) => (cb.checked = false));
-      const allPriceRadio = document.querySelector(
-        'input[name="giatien"][value=""]',
-      );
-      if (allPriceRadio) allPriceRadio.checked = true;
-
-      // Đặt sắp xếp về Mặc định
-      if (sortSelectBox) sortSelectBox.value = "newest";
-
-      filterBooks();
+  // ---------------------------------------------------------
+  // 3. NÚT BỎ CHỌN TẤT CẢ (RESET)
+  // ---------------------------------------------------------
+  const nutLamMoi = document.getElementById("btn-reset-filter");
+  if (nutLamMoi) {
+    nutLamMoi.addEventListener("click", () => {
+      // Chỉ cần chuyển hướng về trang lọc sách gốc (xóa hết tham số trên URL)
+      // PHP sẽ tự động load lại tất cả sách
+      window.location.href = window.location.pathname;
     });
   }
-
-  window.filterBooks = filterBooks;
 });

@@ -1,274 +1,224 @@
-// ==================== MAIN APPLICATION - MODULAR STRUCTURE ====================
+// ==================== CẤU TRÚC CHÍNH CỦA ỨNG DỤNG ====================
 
-// ==================== GLOBAL DATA ====================
-// Data now in js/data.js - remove duplicates
+// ==================== TRẠNG THÁI HỆ THỐNG (STATE) ====================
+let vaiTroHienTai = "khach_hang";
+let giaoDienAdminHienTai = "tong_quan";
+let danhSachYeuThich = new Set();
 
-// ==================== STATE ====================
-let currentRole = 'customer';
-let currentAdminView = 'overview';
-let wishlists = new Set();
-
-// ==================== ADMIN VIEWS REGISTRY ====================
-const adminViews = {
-  overview: overviewView,
-  import: importManagementView,
-  'book-info': bookInfoManagementView,
-  revenue: revenueManagementView,
-  sales: salesManagementView,
-  inventory: inventoryManagementView,
-  reports: reportsView,
-  settings: settingsView,
-  contact: contactView
+// ==================== DANH SÁCH GIAO DIỆN QUẢN TRỊ ====================
+const danhSachGiaoDienAdmin = {
+  tong_quan: typeof overviewView !== "undefined" ? overviewView : null,
+  nhap_sach:
+    typeof importManagementView !== "undefined" ? importManagementView : null,
+  thong_tin_sach:
+    typeof bookInfoManagementView !== "undefined"
+      ? bookInfoManagementView
+      : null,
+  doanh_thu:
+    typeof revenueManagementView !== "undefined" ? revenueManagementView : null,
+  ban_hang:
+    typeof salesManagementView !== "undefined" ? salesManagementView : null,
+  kho_hang:
+    typeof inventoryManagementView !== "undefined"
+      ? inventoryManagementView
+      : null,
+  bao_cao: typeof reportsView !== "undefined" ? reportsView : null,
+  cai_dat: typeof settingsView !== "undefined" ? settingsView : null,
+  lien_he: typeof contactView !== "undefined" ? contactView : null,
 };
 
-// View titles mapping
-const viewTitles = {
-  overview: 'Tổng quan',
-  import: 'Quản lý nhập sách',
-  'book-info': 'Quản lý thông tin sách',
-  revenue: 'Quản lý doanh thu',
-  sales: 'Quản lý bán hàng',
-  inventory: 'Quản lý kho',
-  reports: 'Báo cáo',
-  settings: 'Cài đặt hệ thống',
-  contact: 'Hỗ trợ & Liên hệ'
+// Tiêu đề tương ứng cho từng giao diện
+const tieuDeGiaoDien = {
+  tong_quan: "Tổng quan",
+  nhap_sach: "Quản lý nhập sách",
+  thong_tin_sach: "Quản lý thông tin sách",
+  doanh_thu: "Quản lý doanh thu",
+  ban_hang: "Quản lý bán hàng",
+  kho_hang: "Quản lý kho",
+  bao_cao: "Báo cáo",
+  cai_dat: "Cài đặt hệ thống",
+  lien_he: "Hỗ trợ & Liên hệ",
 };
 
-// ==================== INITIALIZATION ====================
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize components
-  initRoleToggle();
-  initHeroCarousel();
-  initFlashSaleTimer();
-  renderBooks();
-  initCartButton();
-  initAuthButton();
-  initAdminSidebar();
-  initChatbot();
-  loadTheLoaiFilter();
-  
-  console.log('✅ Application initialized successfully');
+// ==================== KHỞI TẠO ỨNG DỤNG ====================
+document.addEventListener("DOMContentLoaded", () => {
+  khoiTaoChuyenDoiVaiTro();
+  khoiTaoDemNguocKhuyenMai();
+  khoiTaoSuKienChoSach(); // Hàm mới thay thế cho renderBooks
+  khoiTaoNutGioHang();
+  khoiTaoNutDangNhap();
+  khoiTaoMenuQuanTri();
+  khoiTaoChatbot();
+
+  console.log("✅ Hệ thống JavaScript đã khởi tạo thành công (Chế độ PHP SSR)");
 });
 
-// ==================== ROLE TOGGLE ====================
-function initRoleToggle() {
-  const btnCustomer = document.getElementById('btn-customer');
-  const btnAdmin = document.getElementById('btn-admin');
-  const storefrontView = document.getElementById('storefront-view');
-  const adminView = document.getElementById('admin-view');
+// ==================== CHUYỂN ĐỔI VAI TRÒ (KHÁCH / ADMIN) ====================
+function khoiTaoChuyenDoiVaiTro() {
+  const nutKhachHang = document.getElementById("btn-customer");
+  const nutAdmin = document.getElementById("btn-admin");
+  const giaoDienCuaHang = document.getElementById("storefront-view");
+  const giaoDienQuanTri = document.getElementById("admin-view");
 
-  btnCustomer.addEventListener('click', () => {
-    currentRole = 'customer';
-    btnCustomer.classList.add('active');
-    btnAdmin.classList.remove('active');
-    storefrontView.style.display = 'block';
-    adminView.style.display = 'none';
-  });
+  if (nutKhachHang && nutAdmin) {
+    nutKhachHang.addEventListener("click", () => {
+      vaiTroHienTai = "khach_hang";
+      nutKhachHang.classList.add("active");
+      nutAdmin.classList.remove("active");
+      giaoDienCuaHang.style.display = "block";
+      giaoDienQuanTri.style.display = "none";
+    });
 
-  btnAdmin.addEventListener('click', () => {
-    currentRole = 'admin';
-    btnAdmin.classList.add('active');
-    btnCustomer.classList.remove('active');
-    storefrontView.style.display = 'none';
-    adminView.style.display = 'flex';
-    loadAdminView(currentAdminView);
-  });
+    nutAdmin.addEventListener("click", () => {
+      vaiTroHienTai = "admin";
+      nutAdmin.classList.add("active");
+      nutKhachHang.classList.remove("active");
+      giaoDienCuaHang.style.display = "none";
+      giaoDienQuanTri.style.display = "flex";
+      taiGiaoDienQuanTri(giaoDienAdminHienTai);
+    });
+  }
 }
 
-// ==================== HERO CAROUSEL ====================
-// function initHeroCarousel() {
-//   window.initHeroCarousel();
-// }
-
-// ==================== FLASH SALE TIMER ====================
-function initFlashSaleTimer() {
-  let hours = 12;
-  let minutes = 45;
-  let seconds = 30;
+// ==================== ĐẾM NGƯỢC FLASH SALE ====================
+function khoiTaoDemNguocKhuyenMai() {
+  let gio = 12;
+  let phut = 45;
+  let giay = 30;
 
   setInterval(() => {
-    seconds--;
-    if (seconds < 0) { seconds = 59; minutes--; }
-    if (minutes < 0) { minutes = 59; hours--; }
-    if (hours < 0) { hours = 24; }
-    
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
-    
-    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
-    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
-    if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+    giay--;
+    if (giay < 0) {
+      giay = 59;
+      phut--;
+    }
+    if (phut < 0) {
+      phut = 59;
+      gio--;
+    }
+    if (gio < 0) {
+      gio = 24;
+    }
+
+    const theGio = document.getElementById("hours");
+    const thePhut = document.getElementById("minutes");
+    const theGiay = document.getElementById("seconds");
+
+    if (theGio) theGio.textContent = gio.toString().padStart(2, "0");
+    if (thePhut) thePhut.textContent = phut.toString().padStart(2, "0");
+    if (theGiay) theGiay.textContent = giay.toString().padStart(2, "0");
   }, 1000);
 }
 
-// ==================== BOOKS RENDERING ====================
-// function renderBooks() {
-//   // Update bookCard callbacks FIRST (before renderAll)
-//   bookCard.onAddToCart = (book) => {
-//     cartDrawer.addItem(book, 1);
-//     toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
-//   };
-  
-//   bookCard.onQuickView = (book) => {
-//     // TODO: bookDetailsModal.open(book) if implemented
-//     console.log('Quick view:', book.name);
-//   };
-  
-//   bookCard.onWishlist = (ids) => {
-//     wishlists = new Set(ids);
-//   };
+// ==================== XỬ LÝ SỰ KIỆN CHO SÁCH (TỪ PHP RENDER RA) ====================
+function khoiTaoSuKienChoSach() {
+  // 1. Xử lý nút "Thêm vào giỏ hàng"
+  // (Giả định PHP in ra thẻ <button class="add-to-cart-btn" data-masach="S01">)
+  const danhSachNutThemGio = document.querySelectorAll(".add-to-cart-btn");
 
-//   bookCard.wishlists = wishlists;
+  danhSachNutThemGio.forEach((nut) => {
+    nut.addEventListener("click", function (suKien) {
+      suKien.preventDefault(); // Ngăn trình duyệt load lại trang nếu nằm trong thẻ <a>
 
-//   const flashBooks = window.featuredBooks.slice(0, 5).map(book => ({...book, badge: 'Flash Sale', originalPrice: book.price * 1.5 }));
-//   const featuredBooks = window.featuredBooks;
-//   const newReleasesBooks = window.newReleases;
+      const maSach = this.getAttribute("data-masach");
+      const tenSach = this.getAttribute("data-tensach") || "Sản phẩm";
 
-//   bookCard.renderAll(flashBooks, 'flash-sale-books', { isFlashSale: true });
-//   bookCard.renderAll(featuredBooks, 'featured-books', {});
-//   bookCard.renderAll(newReleasesBooks, 'new-releases', {});
-  
-//   console.log('✅ Books rendered:', flashBooks.length, 'flash,', featuredBooks.length, 'featured,', newReleasesBooks.length, 'new');
-// }
+      console.log("🛒 Đang thêm sách mã:", maSach);
 
-// ==================== BOOKS RENDERING (TỪ DATABASE) ====================
-async function renderBooks() {
-  try {
-    // 1. Gọi API để lấy danh sách sách
-    const response = await fetch('api/get_sach_filter.php');
-    const result = await response.json();
-
-    console.log("Dữ liệu từ Database:", result);
-
-    if (result.status === 200 && result.data.length > 0) {
-      const booksFromDB = result.data;
-
-      // 2. Chuyển đổi dữ liệu chuẩn xác theo SQL Schema của bạn
-      const mappedBooks = booksFromDB.map(sach => ({
-        id: sach.maSach,              // Từ bảng Sach
-        name: sach.tenSach,           // Từ bảng Sach
-        price: parseFloat(sach.giaBan), // Từ bảng Sach
-        originalPrice: parseFloat(sach.giaBan) * 1.2, // Giả lập giá gốc cao hơn 20% cho đẹp giao diện
-        // Lưu ý: urlAnh và tenTG cần được Backend JOIN từ bảng HinhAnhSach và TacGia
-        image: sach.urlAnh || 'https://picsum.photos/seed/book1/200/300', 
-        author: sach.tenTG || 'Đang cập nhật', 
-        badge: 'Sách Hot'
-      }));
-
-      // 3. Gán sự kiện cho các nút trên giao diện
-      bookCard.onAddToCart = (book) => {
-        cartDrawer.addItem(book, 1);
-        toast.success(`Đã thêm "${book.name}" vào giỏ hàng`);
-      };
-      
-      bookCard.onQuickView = (book) => {
-        console.log('Xem nhanh sách:', book.name);
-      };
-      
-      bookCard.onWishlist = (ids) => {
-        wishlists = new Set(ids);
-      };
-      bookCard.wishlists = wishlists;
-
-      // 4. Phân bổ sách lên các khu vực (Lấy tạm vài cuốn demo)
-      const flashBooks = mappedBooks.slice(0, 5).map(b => ({...b, badge: 'Flash Sale'}));
-      const featuredBooks = mappedBooks.slice(0, 8);
-      const newReleasesBooks = mappedBooks.slice(0, 10);
-
-      // Render ra giao diện
-      bookCard.renderAll(flashBooks, 'flash-sale-books', { isFlashSale: true });
-      bookCard.renderAll(featuredBooks, 'featured-books', {});
-      bookCard.renderAll(newReleasesBooks, 'new-releases', {});
-      
-      console.log('✅ Đã đổ dữ liệu từ DB lên giao diện thành công!');
-      
-    } else {
-      console.error("Không có dữ liệu hoặc lỗi API:", result.message);
-    }
-  } catch (error) {
-    console.error("Lỗi khi kết nối với API:", error);
-  }
-}
-
-// ==================== CART ====================
-function initCartButton() {
-  const cartBtn = document.getElementById('btn-cart');
-  if (cartBtn) {
-    cartBtn.addEventListener('click', () => {
-      cartDrawer.toggle();
-    });
-  }
-}
-
-// ==================== AUTH ====================
-function initAuthButton() {
-  const authBtn = document.getElementById('btn-login');
-  if (authBtn) {
-    authBtn.addEventListener('click', () => {
-      authModal.open('login');
-    });
-  }
-}
-
-// ==================== ADMIN SIDEBAR ====================
-function initAdminSidebar() {
-  document.querySelectorAll('.nav-item[data-view]').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      loadAdminView(item.dataset.view);
+      // Chỗ này gọi hàm của Giỏ hàng (Sẽ Việt hóa file cartDrawer.js sau)
+      if (typeof cartDrawer !== "undefined") {
+        // cartDrawer.addItem(maSach, 1);
+        // toast.success(`Đã thêm "${tenSach}" vào giỏ hàng`);
+        alert(`Đã thêm "${tenSach}" vào giỏ!`); // Tạm thời dùng alert
+      }
     });
   });
 
-  const logoutBtn = document.getElementById('btn-logout');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      logoutModal.open();
-    });
-  }
-
-  // Handle logout
-  logoutModal.onConfirm = () => {
-    document.getElementById('btn-customer').click();
-  };
+  // 2. Tương tự cho nút Yêu thích / Xem nhanh nếu có
+  console.log(
+    `✅ Đã gắn sự kiện click cho ${danhSachNutThemGio.length} nút thêm giỏ hàng.`,
+  );
 }
 
-function loadAdminView(view) {
-  currentAdminView = view;
-  
-  // Update title
-  const viewTitle = document.getElementById('admin-view-title');
-  if (viewTitle) {
-    viewTitle.textContent = viewTitles[view] || 'Tổng quan';
+// ==================== NÚT GIỎ HÀNG (MENU TRÊN) ====================
+function khoiTaoNutGioHang() {
+  const nutGioHang = document.getElementById("btn-cart");
+  if (nutGioHang) {
+    nutGioHang.addEventListener("click", () => {
+      // Gọi file xử lý giỏ hàng riêng
+      if (typeof cartDrawer !== "undefined") {
+        cartDrawer.toggle();
+      }
+    });
   }
-  
-  // Render view content
-  const adminContent = document.getElementById('admin-content');
-  if (adminContent && adminViews[view]) {
-    adminContent.innerHTML = adminViews[view].render();
-    
-    // Initialize chart if available
-    if (adminViews[view].initChart) {
-      adminViews[view].initChart();
+}
+
+// ==================== NÚT ĐĂNG NHẬP ====================
+function khoiTaoNutDangNhap() {
+  const nutDangNhap = document.getElementById("btn-login");
+  if (nutDangNhap) {
+    nutDangNhap.addEventListener("click", () => {
+      if (typeof authModal !== "undefined") {
+        authModal.open("login");
+      }
+    });
+  }
+}
+
+// ==================== MENU SIDEBAR QUẢN TRỊ ====================
+function khoiTaoMenuQuanTri() {
+  const danhSachMenu = document.querySelectorAll(".nav-item[data-view]");
+  danhSachMenu.forEach((menu) => {
+    menu.addEventListener("click", (suKien) => {
+      suKien.preventDefault();
+      taiGiaoDienQuanTri(menu.dataset.view);
+    });
+  });
+
+  const nutDangXuat = document.getElementById("btn-logout");
+  if (nutDangXuat) {
+    nutDangXuat.addEventListener("click", (suKien) => {
+      suKien.preventDefault();
+      if (typeof logoutModal !== "undefined") {
+        logoutModal.open();
+        logoutModal.onConfirm = () => {
+          document.getElementById("btn-customer").click();
+        };
+      }
+    });
+  }
+}
+
+// ==================== TẢI GIAO DIỆN QUẢN TRỊ ====================
+function taiGiaoDienQuanTri(tenGiaoDien) {
+  giaoDienAdminHienTai = tenGiaoDien;
+
+  // Cập nhật tiêu đề
+  const theTieuDe = document.getElementById("admin-view-title");
+  if (theTieuDe) {
+    theTieuDe.textContent = tieuDeGiaoDien[tenGiaoDien] || "Tổng quan";
+  }
+
+  // Hiển thị nội dung
+  const khuVucNoiDung = document.getElementById("admin-content");
+  if (khuVucNoiDung && danhSachGiaoDienAdmin[tenGiaoDien]) {
+    khuVucNoiDung.innerHTML = danhSachGiaoDienAdmin[tenGiaoDien].render();
+
+    // Khởi tạo biểu đồ nếu có
+    if (danhSachGiaoDienAdmin[tenGiaoDien].initChart) {
+      danhSachGiaoDienAdmin[tenGiaoDien].initChart();
     }
   }
-  
-  // Update active nav item
-  document.querySelectorAll('.nav-item').forEach(item => {
-    if (item.dataset.view) {
-      item.classList.toggle('active', item.dataset.view === view);
+
+  // Đổi màu menu đang chọn (Active)
+  document.querySelectorAll(".nav-item").forEach((menu) => {
+    if (menu.dataset.view) {
+      menu.classList.toggle("active", menu.dataset.view === tenGiaoDien);
     }
   });
 }
 
 // ==================== CHATBOT ====================
-function initChatbot() {
-  // Chatbot is already initialized in chatbot.js
+function khoiTaoChatbot() {
+  // Logic chatbot nếu có
 }
-
-// ==================== EXPORTS ====================
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { booksData, newReleasesData };
-}
-

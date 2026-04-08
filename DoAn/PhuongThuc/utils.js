@@ -1,50 +1,33 @@
-// ==================== UTILITY FUNCTIONS ====================
+// ==================== CÁC HÀM TIỆN ÍCH DÙNG CHUNG ====================
 
-// Format price to Vietnamese Dong
-function formatPrice(price) {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+// Hàm định dạng tiền tệ sang chuẩn Việt Nam Đồng (VNĐ)
+// Dùng khi cần tính toán tổng tiền trong giỏ hàng bằng JS
+function dinhDangTien(giaTien) {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(giaTien);
 }
 
-// Show toast notification
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toast-message');
-  toastMessage.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+// Hàm hiển thị popup thông báo góc màn hình (Toast)
+function hienThiThongBao(noiDung) {
+  const theThongBao = document.getElementById("toast");
+  const theNoiDungThongBao = document.getElementById("toast-message");
+
+  if (theThongBao && theNoiDungThongBao) {
+    theNoiDungThongBao.textContent = noiDung;
+    theThongBao.classList.add("show");
+
+    // Tự động ẩn thông báo sau 3 giây (3000ms)
+    setTimeout(() => {
+      theThongBao.classList.remove("show");
+    }, 3000);
+  }
 }
 
-// Generate book card HTML
-function createBookCard(book, isFlashSale = false) {
-  const displayPrice = isFlashSale ? Math.floor(book.price * 0.7) : book.price;
-  const displayOriginal = isFlashSale ? book.price : book.originalPrice;
-  
-  return `
-    <div class="book-card" data-book-id="${book.id}">
-      <div class="book-image">
-        <img src="${book.image}" alt="${book.name}">
-        <span class="book-badge ${isFlashSale ? 'flash' : ''}">${isFlashSale ? 'Flash Sale' : (book.badge || '')}</span>
-      </div>
-      <div class="book-info">
-        <h3 class="book-name">${book.name}</h3>
-        <p class="book-author">${book.author}</p>
-        <div class="book-card-bottom">
-          <div class="book-price">
-            <span class="current-price">${formatPrice(displayPrice)}</span>
-            ${displayOriginal ? `<span class="original-price">${formatPrice(displayOriginal)}</span>` : ''}
-          </div>
-          <div class="book-rating">
-            <i class="fas fa-star"></i>
-            <span>${book.rating}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
+// LƯU Ý: Đã xóa hoàn toàn hàm createBookCard() vì HTML bây giờ do PHP in ra trực tiếp!
 
-// Export utilities
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { formatPrice, showToast, createBookCard };
+// Hỗ trợ xuất module (Nếu dự án có dùng bộ đóng gói, nếu không có thể bỏ qua)
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { dinhDangTien, hienThiThongBao };
 }
-

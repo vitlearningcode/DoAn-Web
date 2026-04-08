@@ -1,8 +1,15 @@
-// Global data bridge for vanilla JS - no import (data.js globals)
-window.featuredBooks = featuredBooks;
-window.newReleases = newReleases;
-window.heroSlides = heroSlides;
-window.categories = categories;
+// ==========================================
+// CẦU NỐI DỮ LIỆU TOÀN CỤC (GLOBAL DATA BRIDGE)
+// ==========================================
 
-console.log('✅ Global data loaded:', featuredBooks.length, 'featured,', newReleases.length, 'new releases');
+// Gắn dữ liệu tĩnh (Banner, Danh mục) vào window để các file JS khác có thể đọc được
+if (typeof danhSachBanner !== "undefined") {
+  window.danhSachBanner = danhSachBanner;
+}
 
+if (typeof danhSachDanhMuc !== "undefined") {
+  window.danhSachDanhMuc = danhSachDanhMuc;
+}
+
+// Xóa console.log báo cáo số lượng sách ảo cũ, thay bằng thông báo tiếng Việt
+console.log("✅ Đã tải xong dữ liệu tĩnh (Banner & Danh mục)");
