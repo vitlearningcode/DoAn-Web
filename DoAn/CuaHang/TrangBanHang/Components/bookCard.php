@@ -42,11 +42,10 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
     // Mô tả: rút ngắn + loại bỏ xuống dòng để an toàn trong data-attribute
     $moTaTam     = str_replace(["\r\n", "\n", "\r"], ' ', $sach['moTa'] ?? '');
     $dataMoTa    = htmlspecialchars(mb_substr($moTaTam, 0, 600), ENT_QUOTES);
-    // Thông tin xuất bản
-    $dataNXB     = htmlspecialchars($sach['nhaXuatBan']  ?? '', ENT_QUOTES);
-    $dataSoTrang = htmlspecialchars((string)($sach['soTrang'] ?? ''), ENT_QUOTES);
-    $dataBia     = htmlspecialchars($sach['hinhThucBia'] ?? '', ENT_QUOTES);
-    $dataKT      = htmlspecialchars($sach['kichThuoc']   ?? '', ENT_QUOTES);
+    $dataNXB     = htmlspecialchars($sach['nhaXuatBan']  ?? 'Đang cập nhật', ENT_QUOTES);
+    $dataNamSX   = htmlspecialchars((string)($sach['namSX'] ?? 'Đang cập nhật'), ENT_QUOTES);
+    $dataBia     = htmlspecialchars($sach['hinhThucBia'] ?? 'Đang cập nhật', ENT_QUOTES);
+    $dataTonKho  = htmlspecialchars((string)($sach['soLuongTon']   ?? '0'), ENT_QUOTES);
 
     // ── Nhãn góc trái dọc ────────────────────────────────────────────────
     $nhanHtml = '';
@@ -94,9 +93,9 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
          data-da-ban=\"{$dataDaBan}\"
          data-mo-ta=\"{$dataMoTa}\"
          data-nxb=\"{$dataNXB}\"
-         data-so-trang=\"{$dataSoTrang}\"
+         data-nam-sx=\"{$dataNamSX}\"
          data-bia=\"{$dataBia}\"
-         data-kich-thuoc=\"{$dataKT}\">
+         data-ton-kho=\"{$dataTonKho}\">
 
     <div class=\"book-image\">
         " . ($nhanHtml ? "<div class=\"book-badges\">{$nhanHtml}</div>" : '') . "

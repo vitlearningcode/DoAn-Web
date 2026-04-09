@@ -16,9 +16,10 @@
 // ================================================================
 $ds_flashsale = $pdo->query("
     SELECT
-        s.maSach, s.tenSach, s.giaBan,
+        s.maSach, s.tenSach, s.giaBan, s.moTa, s.namSX, s.loaiBia AS hinhThucBia, s.soLuongTon,
         ckm.phanTramGiam,
         ROUND(s.giaBan * (1 - ckm.phanTramGiam / 100)) AS giaSau,
+        (SELECT tenNXB FROM NhaXuatBan nxb WHERE nxb.maNXB = s.maNXB) AS nhaXuatBan,
         (SELECT urlAnh FROM HinhAnhSach WHERE maSach = s.maSach LIMIT 1) AS hinhAnh,
         (SELECT GROUP_CONCAT(tg.tenTG SEPARATOR ', ')
          FROM Sach_TacGia stg JOIN TacGia tg ON stg.maTG = tg.maTG

@@ -123,16 +123,16 @@
             <span id="mn-nxb"           class="mn-gia-tri-thong-tin">—</span>
           </div>
           <div class="mn-thong-tin-hang">
-            <span class="mn-nhan-thong-tin">Số trang</span>
-            <span id="mn-so-trang"      class="mn-gia-tri-thong-tin">—</span>
+            <span class="mn-nhan-thong-tin">Năm sản xuất</span>
+            <span id="mn-nam-sx"        class="mn-gia-tri-thong-tin">—</span>
           </div>
           <div class="mn-thong-tin-hang">
             <span class="mn-nhan-thong-tin">Hình thức bìa</span>
             <span id="mn-hinh-thuc-bia" class="mn-gia-tri-thong-tin">—</span>
           </div>
           <div class="mn-thong-tin-hang">
-            <span class="mn-nhan-thong-tin">Kích thước</span>
-            <span id="mn-kich-thuoc"    class="mn-gia-tri-thong-tin">—</span>
+            <span class="mn-nhan-thong-tin">Tồn kho</span>
+            <span id="mn-ton-kho"       class="mn-gia-tri-thong-tin">—</span>
           </div>
         </div>
 

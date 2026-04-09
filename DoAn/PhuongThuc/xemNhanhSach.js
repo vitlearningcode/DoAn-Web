@@ -71,9 +71,9 @@
         tongBan     : card.getAttribute('data-da-ban')     || '0',
         moTa        : card.getAttribute('data-mo-ta')      || '',
         nhaXuatBan  : card.getAttribute('data-nxb')        || '',
-        soTrang     : card.getAttribute('data-so-trang')   || '',
+        namSX       : card.getAttribute('data-nam-sx')     || '',
         hinhThucBia : card.getAttribute('data-bia')        || '',
-        kichThuoc   : card.getAttribute('data-kich-thuoc') || '',
+        tonKho      : card.getAttribute('data-ton-kho')    || '',
       };
 
       // Nhãn từ card (BÁN CHẠY / FLASH SALE / MỚI…)
@@ -163,9 +163,9 @@
 
     // Thông tin xuất bản
     datVan('mn-nxb',            d.nhaXuatBan  || 'Đang cập nhật');
-    datVan('mn-so-trang',       d.soTrang      || 'Đang cập nhật');
+    datVan('mn-nam-sx',         d.namSX       || 'Đang cập nhật');
     datVan('mn-hinh-thuc-bia',  d.hinhThucBia || 'Đang cập nhật');
-    datVan('mn-kich-thuoc',     d.kichThuoc    || 'Đang cập nhật');
+    datVan('mn-ton-kho',        d.tonKho      || 'Đang cập nhật');
 
     // Mô tả sách
     var moTa   = d.moTa || 'Chưa có mô tả cho sách này.';
