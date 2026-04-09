@@ -19,6 +19,7 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
     <title>Book Sales Management - Cửa hàng sách trực tuyến</title>
     <link rel="stylesheet" href="GiaoDien/style.css">
     <link rel="stylesheet" href="GiaoDien/xemNhanhSach.css">
+    <link rel="stylesheet" href="GiaoDien/gioHang.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>const dangDangNhap = <?= $isLoggedIn ? 'true' : 'false' ?>;</script>
 </head>
@@ -159,6 +160,7 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 <?php include_once "CuaHang/TrangBanHang/GiaoDien/footer.php"; ?>
 
 <?php include_once "CuaHang/TrangBanHang/ChiTietSach/formXemNhanhSach.php"; ?>
+<?php include_once "CuaHang/TrangBanHang/GioHang/formGioHang.php"; ?>
 
 <script src="PhuongThuc/thongBao.js"></script>
 <script src="PhuongThuc/trinhChieuBanner.js"></script>
