@@ -40,7 +40,7 @@ foreach ($cart as $item) {
 
 <div class="checkout-container">
     <header class="checkout-header">
-        <a href="../../index.php" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại cửa hàng</a>
+        <a href="../../../index.php" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại cửa hàng</a>
         <h2>Bảo Mật Thanh Toán Cửa Hàng Sách</h2>
     </header>
     
@@ -114,7 +114,7 @@ foreach ($cart as $item) {
             <div class="section-box summary-box">
                 <div class="summary-header">
                     <h3>Đơn đặt hàng (<?= count($cart) ?>)</h3>
-                    <a href="../../index.php">Sửa giỏ hàng</a>
+                    <a href="../../../index.php">Sửa giỏ hàng</a>
                 </div>
                 
                 <div class="cart-scroll-list">

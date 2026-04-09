@@ -35,7 +35,7 @@ try {
     $pdo->commit();
     
     $msg = $isTimeout ? "Đã hết thời gian thanh toán (7 phút). Đơn hàng đã tự động bị hủy và hoàn trả sách vào kho!" : "Bạn đã hủy thanh toán. Đơn hàng đã được hoàn kho!";
-    echo "<script>alert('$msg'); window.location.href='../../index.php';</script>";
+    echo "<script>alert('$msg'); window.location.href='../../../index.php';</script>";
 } catch (Exception $e) {
     $pdo->rollBack();
     die("Lỗi hủy đơn: " . $e->getMessage());

@@ -23,7 +23,7 @@ $maDH = $_GET['maDH'] ?? '';
         <h1>Đặt hàng thành công!</h1>
         <p>Mã đơn hàng của bạn: <strong><?= htmlspecialchars($maDH) ?></strong></p>
         <p>Chúng tôi đã nhận được thông tin và sẽ gửi email xác nhận cho bạn trong giây lát.</p>
-        <a href="../../index.php" class="btn-home">Trở về cửa hàng</a>
+        <a href="../../../index.php" class="btn-home">Trở về cửa hàng</a>
     </div>
     
     <!-- Script dọn dẹp LocalStorage -->
