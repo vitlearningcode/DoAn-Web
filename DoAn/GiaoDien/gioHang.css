@@ -9,7 +9,7 @@
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 100;
+    z-index: 9990;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -30,7 +30,7 @@
     max-width: 450px;
     background: #fff;
     box-shadow: -10px 0 25px rgba(0,0,0,0.1);
-    z-index: 101;
+    z-index: 9999;
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
     display: flex;
@@ -152,6 +152,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .cart-item-info {
@@ -339,7 +341,7 @@
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    z-index: 200;
+    z-index: 10000;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, transform 0.3s, visibility 0.3s;

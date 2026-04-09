@@ -162,13 +162,13 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 <?php include_once "CuaHang/TrangBanHang/ChiTietSach/formXemNhanhSach.php"; ?>
 <?php include_once "CuaHang/TrangBanHang/GioHang/formGioHang.php"; ?>
 
-<script src="PhuongThuc/thongBao.js"></script>
+<script src="PhuongThuc/components/thongBao.js"></script>
 <script src="PhuongThuc/trinhChieuBanner.js"></script>
-<script src="PhuongThuc/bookCard.js"></script>
+<script src="PhuongThuc/components/bookCard.js"></script>
 <script src="PhuongThuc/cart.js"></script>
-<script src="PhuongThuc/xacThuc.js"></script>
-<script src="PhuongThuc/xacNhanDangXuat.js"></script>
-<script src="PhuongThuc/chatbot.js"></script>
+<script src="PhuongThuc/components/xacThuc.js"></script>
+<script src="PhuongThuc/components/xacNhanDangXuat.js"></script>
+<script src="PhuongThuc/components/chatbot.js"></script>
 <script src="PhuongThuc/btnDanhMuc.js"></script>
 <script src="PhuongThuc/btnThemGioHang.js"></script>
 <script src="PhuongThuc/app.js"></script>
