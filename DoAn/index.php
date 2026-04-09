@@ -18,6 +18,7 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Sales Management - Cửa hàng sách trực tuyến</title>
     <link rel="stylesheet" href="GiaoDien/style.css">
+    <link rel="stylesheet" href="GiaoDien/xemNhanhSach.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>const dangDangNhap = <?= $isLoggedIn ? 'true' : 'false' ?>;</script>
 </head>
@@ -157,6 +158,8 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 
 <?php include_once "CuaHang/TrangBanHang/GiaoDien/footer.php"; ?>
 
+<?php include_once "CuaHang/TrangBanHang/ChiTietSach/formXemNhanhSach.php"; ?>
+
 <script src="PhuongThuc/thongBao.js"></script>
 <script src="PhuongThuc/trinhChieuBanner.js"></script>
 <script src="PhuongThuc/bookCard.js"></script>
@@ -167,6 +170,7 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 <script src="PhuongThuc/btnDanhMuc.js"></script>
 <script src="PhuongThuc/btnThemGioHang.js"></script>
 <script src="PhuongThuc/app.js"></script>
+<script src="PhuongThuc/xemNhanhSach.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {

@@ -3,6 +3,9 @@
  * bookCard.php
  * Chứa hàm hienThiTheSach() — render card hiển thị thông tin một cuốn sách.
  * Được include từ index.php; dùng chung scope $pdo, không require DB ở đây.
+ *
+ * v2: Bổ sung data-* attributes cho modal Xem Nhanh.
+ *     JS đọc trực tiếp từ card — không AJAX, không JSON.
  */
 
 /**
@@ -14,25 +17,44 @@
  */
 function hienThiTheSach(array $sach, array $nhanHieu = []): string
 {
-    $anh        = !empty($sach['hinhAnh'])  ? htmlspecialchars($sach['hinhAnh'])
+    // ── Dữ liệu cơ bản ──────────────────────────────────────────────────
+    $anh        = !empty($sach['hinhAnh'])  ? htmlspecialchars($sach['hinhAnh'], ENT_QUOTES)
                                             : 'https://placehold.co/300x400/eff6ff/2563eb?text=📚';
-    $ten        = htmlspecialchars($sach['tenSach']);
-    $tacGia     = htmlspecialchars(!empty($sach['tacGia'])  ? $sach['tacGia']  : 'Đang cập nhật');
-    $theLoai    = htmlspecialchars(!empty($sach['theLoai']) ? $sach['theLoai'] : '');
-    $giaBan     = (float)($sach['giaBan']   ?? 0);
-    $giaSau     = isset($sach['giaSau'])     ? (float)$sach['giaSau'] : null;
-    $diem       = (float)($sach['diemTB']   ?? 0);
-    $soLuotDG   = (int)($sach['soReview']   ?? 0);
-    $maSach     = htmlspecialchars($sach['maSach']);
+    $ten        = htmlspecialchars($sach['tenSach'] ?? '', ENT_QUOTES);
+    $tacGia     = htmlspecialchars(!empty($sach['tacGia'])  ? $sach['tacGia']  : 'Đang cập nhật', ENT_QUOTES);
+    $theLoai    = htmlspecialchars(!empty($sach['theLoai']) ? $sach['theLoai'] : '', ENT_QUOTES);
+    $giaBan     = (float)($sach['giaBan']  ?? 0);
+    $giaSau     = isset($sach['giaSau'])    ? (float)$sach['giaSau'] : null;
+    $diem       = (float)($sach['diemTB']  ?? 0);
+    $soLuotDG   = (int)($sach['soReview']  ?? 0);
+    $maSach     = htmlspecialchars($sach['maSach'] ?? '', ENT_QUOTES);
+    $phanTramGiam = (int)($sach['phanTramGiam'] ?? 0);
     $giaHienTai = ($giaSau !== null) ? $giaSau : $giaBan;
 
-    /* Nhãn góc trái dọc */
+    // ── Data-* cho Modal Xem Nhanh (dùng ENT_QUOTES để an toàn trong thuộc tính) ───
+    $dataTacGia  = htmlspecialchars($sach['tacGia']       ?? '', ENT_QUOTES);
+    $dataTheLoai = htmlspecialchars($sach['theLoai']      ?? '', ENT_QUOTES);
+    $dataDiem    = htmlspecialchars((string)($sach['diemTB']  ?? ''), ENT_QUOTES);
+    $dataReviews = htmlspecialchars((string)($sach['soReview'] ?? ''), ENT_QUOTES);
+    $dataGiam    = htmlspecialchars((string)$phanTramGiam,  ENT_QUOTES);
+    // tongBanThang (bán chạy) hoặc tongBan (tổng), ưu tiên tongBanThang
+    $dataDaBan   = htmlspecialchars((string)($sach['tongBanThang'] ?? ($sach['tongBan'] ?? '')), ENT_QUOTES);
+    // Mô tả: rút ngắn + loại bỏ xuống dòng để an toàn trong data-attribute
+    $moTaTam     = str_replace(["\r\n", "\n", "\r"], ' ', $sach['moTa'] ?? '');
+    $dataMoTa    = htmlspecialchars(mb_substr($moTaTam, 0, 600), ENT_QUOTES);
+    // Thông tin xuất bản
+    $dataNXB     = htmlspecialchars($sach['nhaXuatBan']  ?? '', ENT_QUOTES);
+    $dataSoTrang = htmlspecialchars((string)($sach['soTrang'] ?? ''), ENT_QUOTES);
+    $dataBia     = htmlspecialchars($sach['hinhThucBia'] ?? '', ENT_QUOTES);
+    $dataKT      = htmlspecialchars($sach['kichThuoc']   ?? '', ENT_QUOTES);
+
+    // ── Nhãn góc trái dọc ────────────────────────────────────────────────
     $nhanHtml = '';
     foreach ($nhanHieu as $nhan) {
         $nhanHtml .= "<span class=\"book-badge {$nhan['class']}\">{$nhan['label']}</span>\n";
     }
 
-    /* Điểm đánh giá */
+    // ── Khối đánh giá ────────────────────────────────────────────────────
     if ($diem > 0) {
         $danhGiaHtml = "
             <div class=\"book-rating\">
@@ -49,7 +71,7 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
             </div>";
     }
 
-    /* Giá */
+    // ── Giá hiển thị ─────────────────────────────────────────────────────
     $giaHienThi = number_format($giaHienTai, 0, ',', '.');
     $giaGocHtml = ($giaSau !== null)
         ? '<span class="original-price">' . number_format($giaBan, 0, ',', '.') . ' ₫</span>'
@@ -59,10 +81,22 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
 
     return "
     <div class=\"book-card\"
-     data-id=\"{$maSach}\"
-     data-name=\"{$ten}\"
-     data-price=\"{$giaHienTai}\"
-     data-image=\"{$anh}\">
+         data-id=\"{$maSach}\"
+         data-name=\"{$ten}\"
+         data-price=\"{$giaHienTai}\"
+         data-gia-ban=\"{$giaBan}\"
+         data-image=\"{$anh}\"
+         data-giam=\"{$dataGiam}\"
+         data-tac-gia=\"{$dataTacGia}\"
+         data-the-loai=\"{$dataTheLoai}\"
+         data-diem=\"{$dataDiem}\"
+         data-reviews=\"{$dataReviews}\"
+         data-da-ban=\"{$dataDaBan}\"
+         data-mo-ta=\"{$dataMoTa}\"
+         data-nxb=\"{$dataNXB}\"
+         data-so-trang=\"{$dataSoTrang}\"
+         data-bia=\"{$dataBia}\"
+         data-kich-thuoc=\"{$dataKT}\">
 
     <div class=\"book-image\">
         " . ($nhanHtml ? "<div class=\"book-badges\">{$nhanHtml}</div>" : '') . "
