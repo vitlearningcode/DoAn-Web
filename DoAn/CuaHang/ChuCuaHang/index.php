@@ -7,18 +7,15 @@ session_start();
 require_once '../../KetNoi/config/db.php';
 
 // ── [1] BẢO VỆ QUYỀN TRUY CẬP ──────────────────────────────
-// TODO: Bỏ comment dòng dưới khi đồng đội hoàn thành phần login/session.
-// Hiện tại tạm bỏ qua để có thể build & kiểm tra giao diện trước.
-/*
-if (!isset($_SESSION['maVT']) || $_SESSION['maVT'] != 1) {
-    header('Location: ../../index.php?thongbao=' . urlencode('Bạn không có quyền truy cập trang này.') . '&loai=error');
+// Kiểm tra session từ xuly_dangnhap.php (vaitro lưu dạng chuỗi tenVT)
+if (!isset($_SESSION['vaitro']) || strtolower($_SESSION['vaitro']) !== 'admin') {
+    // Chưa đăng nhập hoặc không phải Admin → về trang chủ
+    header('Location: ../../index.php');
     exit;
 }
-*/
 
-// ── [2] LẤY THÔNG TIN ADMIN (tạm thời dùng giá trị mặc định) ──
-// Sau khi login xong: $tenAdmin = $_SESSION['tenND'];
-$tenAdmin = $_SESSION['tenND'] ?? 'Admin';
+// ── [2] LẤY THÔNG TIN ADMIN TỪ SESSION ──
+$tenAdmin = $_SESSION['ten_nguoi_dung'] ?? ($_SESSION['tendangnhap'] ?? 'Admin');
 
 // ── [3] ROUTING: đọc ?trang= ──────────────────────────────────
 $cacTrang = [

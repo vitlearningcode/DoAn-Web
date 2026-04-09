@@ -122,8 +122,7 @@ if (isset($pdo)) {
             <i class="fas fa-store"></i>
             <span>Trang bán hàng</span>
         </a>
-        <!-- TODO: Khi đồng đội làm xong login, đổi href thành action logout thực -->
-        <a href="../../index.php" class="adm-nav-item logout">
+        <a href="../../xuly_dangxuat.php" class="adm-nav-item logout">
             <i class="fas fa-sign-out-alt"></i>
             <span>Đăng xuất</span>
         </a>
