@@ -21,12 +21,16 @@
 
   // ── Mở / Đóng modal ──────────────────────────────────────────────────
   function moModal() {
-    overlay.classList.add('active');
+    // Tính chiều rộng scrollbar để bù vào padding, tránh giật trang
+    var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarWidth + 'px';
     document.body.style.overflow = 'hidden';
+    overlay.classList.add('active');
   }
 
   function dongModal() {
     overlay.classList.remove('active');
+    document.body.style.paddingRight = '';
     document.body.style.overflow = '';
     sachHienTai = null;
   }
