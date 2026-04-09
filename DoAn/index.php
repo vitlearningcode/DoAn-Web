@@ -5,8 +5,9 @@ $isLoggedIn = isset($_SESSION['nguoi_dung_id']);
 
 // ── Tải các thành phần chức năng ──────────────────────────────────────
 require_once "CuaHang/TrangBanHang/Components/bookCard.php";
-require_once "CuaHang/TrangBanHang/FlashSale/taiFlashSale.php";
-require_once "CuaHang/TrangBanHang/LoadDuLieu/taiDanhSach_Sach.php";
+require_once "CuaHang/TrangBanHang/KhuVucTrungBay/taiFlashSale.php";
+require_once "CuaHang/TrangBanHang/KhuVucTrungBay/taiSachBanChay.php";
+require_once "CuaHang/TrangBanHang/KhuVucTrungBay/taiSachMoi.php";
 require_once "CuaHang/TrangBanHang/LoadDanhMuc/taiDanhSach_DanhMuc.php";
 require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 ?>

@@ -5,7 +5,7 @@
  *
  * Yêu cầu: $pdo đã được khởi tạo từ file gọi (index.php).
  * Kết quả:
- *   $ds_flashsale       — Mảng sách đang Flash Sale (tối đa 5 cuốn)
+ *   $ds_flashsale         — Mảng sách đang Flash Sale (tối đa 5 cuốn)
  *   $flashSale_ThoiGianKT — Thời gian kết thúc Flash Sale gần nhất
  */
 
