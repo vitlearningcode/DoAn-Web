@@ -275,11 +275,17 @@ if ($suaMaSach) {
         <?php endif; ?>
 
         <div class="adm-form-grid">
+            <!-- Mã sách tự sinh -->
             <div class="adm-form-group">
-                <label>Mã sách <?= $isEdit ? '' : '<span class="req">*</span>' ?></label>
-                <input class="adm-input" type="text" name="maSach"
-                       value="<?= htmlspecialchars($sachSua['maSach'] ?? '') ?>"
-                       placeholder="VD: S024" <?= $isEdit ? 'readonly style="background:#f8fafc"' : 'required' ?>>
+                <label>Mã sách</label>
+                <?php if ($isEdit): ?>
+                    <input class="adm-input" type="text" value="<?= htmlspecialchars($sachSua['maSach']) ?>" readonly style="background:#f8fafc;color:#64748b">
+                    <input type="hidden" name="maSach_cu" value="<?= htmlspecialchars($sachSua['maSach']) ?>">
+                <?php else: ?>
+                    <div style="background:#eff6ff;border:1px dashed #93c5fd;border-radius:8px;padding:10px 12px;font-size:13px;color:#1d4ed8">
+                        <i class="fas fa-magic"></i> Tự động sinh khi lưu (dạng S024, S025...)
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="adm-form-group">
                 <label>Tên sách <span class="req">*</span></label>
@@ -310,8 +316,14 @@ if ($suaMaSach) {
             </div>
             <div class="adm-form-group">
                 <label>Số lượng tồn kho</label>
-                <input class="adm-input" type="number" name="soLuongTon" min="0"
-                       value="<?= htmlspecialchars($sachSua['soLuongTon'] ?? 0) ?>">
+                <?php if ($isEdit): ?>
+                    <input class="adm-input" type="number" value="<?= htmlspecialchars($sachSua['soLuongTon'] ?? 0) ?>" readonly
+                           style="background:#f8fafc;color:#64748b" title="Chỉ cập nhật qua phiếu nhập hàng">
+                <?php else: ?>
+                    <div style="background:#f0fdf4;border:1px dashed #86efac;border-radius:8px;padding:10px 12px;font-size:13px;color:#15803d">
+                        <i class="fas fa-info-circle"></i> Tồn kho = 0 khi thêm mới. Tăng dần qua <strong>phiếu nhập</strong>.
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="adm-form-group">
                 <label>Loại bìa</label>
