@@ -181,6 +181,12 @@ function badgeInfo(string $tt): array {
         </div>
         <?php endif; ?>
 
+        <?php if (!empty($thongBao) && $thongBao === 'ok_huy'): ?>
+        <div style="background:#fee2e2;color:#dc2626;padding:10px 18px;border-radius:8px;margin-bottom:14px;font-weight:500;">
+            <i class="fas fa-times-circle"></i> Đơn hàng của bạn đã được hủy thành công. Hàng sẽ được hoàn lại kho.
+        </div>
+        <?php endif; ?>
+
         <?php if (empty($dsDonHang)): ?>
         <div class="dh-empty">
             <i class="fas fa-box-open"></i>
@@ -250,8 +256,20 @@ function badgeInfo(string $tt): array {
                     <i class="fas fa-map-marker-alt"></i>
                     <?= htmlspecialchars(mb_strimwidth($dh['diaChiChiTiet'], 0, 40, '…')) ?>
                 </div>
-                <div class="dh-order-total">
-                    Tổng cộng: <strong><?= number_format($dh['tongTien'], 0, ',', '.') ?>đ</strong>
+                <div class="dh-order-actions">
+                    <div class="dh-order-total">
+                        Tổng cộng: <strong><?= number_format($dh['tongTien'], 0, ',', '.') ?>đ</strong>
+                    </div>
+                    <?php if ($dh['trangThai'] === 'ChoDuyet'): ?>
+                    <!-- Nút Hủy đơn: chỉ hiện khi đơn đang Chờ Duyệt -->
+                    <form method="POST" action="xuly_huyDon.php"
+                          onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng <?= htmlspecialchars($dh['maDH']) ?> không?')">
+                        <input type="hidden" name="maDH" value="<?= htmlspecialchars($dh['maDH']) ?>">
+                        <button type="submit" class="dh-btn-cancel-order">
+                            <i class="fas fa-times"></i> Hủy đơn
+                        </button>
+                    </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

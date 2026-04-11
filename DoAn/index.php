@@ -92,14 +92,48 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
                     <div class="timer-block"><div class="timer-value timer-seconds" id="seconds">00</div><span>Giây</span></div>
                 </div>
             </div>
-            <div class="books-grid">
+            <div class="books-grid flash-sale-grid">
                 <?php foreach ($ds_flashsale as $sach):
+                    // ── Tính toán thanh tiến độ kiểu Shopee ────────────────
+                    $tongBan   = (int)($sach['tongBan'] ?? 0);
+                    $soLuongKM = (int)($sach['soLuongKhuyenMai'] ?? 0);
+                    $conLai    = (int)($sach['soLuongTon'] ?? 0);
+                    $tongBanDau = ($soLuongKM > 0) ? $soLuongKM : max(1, $tongBan + $conLai);
+                    $pctDaBan   = min(100, round($tongBan / $tongBanDau * 100));
+                    $pctConLai  = 100 - $pctDaBan;
+
+                    $gapHet  = ($conLai <= 5 && $conLai > 0);
+                    $sapHet  = (!$gapHet && $pctDaBan >= 80);
+                    $isPopular = (!$gapHet && !$sapHet);
+
+                    // Chuẩn bị HTML label cho thanh
+                    $progressLabelHtml = '';
+                    if ($isPopular) {
+                        $progressLabelHtml = '<div class="nhan-chu vi-tri-tuyet-doi">ĐANG BÁN CHẠY</div>';
+                    } elseif ($gapHet) {
+                        $progressLabelHtml = '<div class="khoang-dem vi-tri-tuyet-doi"></div><div class="nhan-chu vi-tri-tuyet-doi">CHỈ CÒN ' . $conLai . '</div>';
+                    } else {
+                        $progressLabelHtml = '<div class="nhan-chu vi-tri-tuyet-doi">GẦN HẾT HÀNG</div>';
+                    }
+
+                    $borderRadiusDaBan = $pctDaBan >= 100 ? '8px' : '8px 0 0 8px';
+
+                    // Khối HTML customBottom sẽ được chèn vào trong bookCard
+                    $customHtmlBottom = "
+                    <div class=\"thanh-tien-do\">
+                        <div class=\"thanh-nen\">
+                            {$progressLabelHtml}
+                            <div class=\"phan-da-ban\" style=\"width: {$pctDaBan}%; border-radius: {$borderRadiusDaBan};\"></div>
+                            <div class=\"phan-con-lai\"></div>
+                        </div>
+                    </div>";
+
                     /* Badge 1 (cam): nhãn "Flash Sale"
                        Badge 2 (đỏ): "-XX%" — phanTramGiam thực từ ChiTietKhuyenMai */
                     echo hienThiTheSach($sach, [
                         ['class' => 'label-type',    'label' => 'Flash Sale'],
                         ['class' => 'label-discount', 'label' => '-' . $sach['phanTramGiam'] . '%'],
-                    ]);
+                    ], $customHtmlBottom);
                 endforeach; ?>
             </div>
         </div>
