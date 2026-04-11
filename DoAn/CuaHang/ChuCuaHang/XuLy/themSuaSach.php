@@ -2,7 +2,8 @@
 // ══════════════════════════════════════════════════════
 //  themSuaSach.php — Xử lý thêm / sửa sách
 // ══════════════════════════════════════════════════════
-session_start();
+// [BẢO MẬT] Kiểm tra quyền Admin trước tiên
+require_once __DIR__ . '/../../_kiemTraQuyen.php';
 require_once '../../../KetNoi/config/db.php';
 
 function redirectSach(string $msg, string $loai = 'success'): never {
@@ -25,6 +26,40 @@ $moTa       = trim($_POST['moTa']      ?? '');
 $urlAnh     = trim($_POST['urlAnh']    ?? '');
 $maTG_list  = $_POST['maTG'] ?? [];
 $maTL_list  = $_POST['maTL'] ?? [];
+
+// ── Xử lý upload ảnh bìa (ưu tiên file upload hơn URL text) ─────────────
+$anhDaUpload = '';
+if (!empty($_FILES['anhBia_file']['name']) && $_FILES['anhBia_file']['error'] === UPLOAD_ERR_OK) {
+    $file     = $_FILES['anhBia_file'];
+    $ext      = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $extChoPhep = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+    if (!in_array($ext, $extChoPhep)) {
+        redirectSach('Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP, GIF.', 'error');
+    }
+
+    // Đổi tên file = time() + tên gốc đã làm sạch → tránh trùng, tránh path traversal
+    $tenGocSach = preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($file['name']));
+    $tenFileMoi = time() . '_' . $tenGocSach;
+    $thuMuc     = __DIR__ . '/../../../HinhAnh/sach/';
+    $duongDan   = $thuMuc . $tenFileMoi;
+
+    if (!is_dir($thuMuc)) {
+        mkdir($thuMuc, 0755, true);
+    }
+
+    if (!move_uploaded_file($file['tmp_name'], $duongDan)) {
+        redirectSach('Không thể lưu file ảnh. Kiểm tra quyền ghi thư mục HinhAnh/sach/.', 'error');
+    }
+
+    // Đường dẫn URL tương đối để lưu vào DB
+    $anhDaUpload = '/DoAn/HinhAnh/sach/' . $tenFileMoi;
+}
+
+// Nếu có upload file thì dùng, không thì dùng URL text nhập tay
+if ($anhDaUpload !== '') {
+    $urlAnh = $anhDaUpload;
+}
 
 $isEdit = $maSach_cu !== '';
 

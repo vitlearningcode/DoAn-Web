@@ -2,6 +2,9 @@
 // ══════════════════════════════════════════════════════
 //  khuyenMai.php — Quản lý chiến dịch khuyến mãi
 // ══════════════════════════════════════════════════════
+
+// [BẢO MẬT] Kiểm tra quyền Admin — chặn truy cập trực tiếp
+require_once __DIR__ . '/../_kiemTraQuyen.php';
 try {
     $dsKM = $pdo->query("
         SELECT km.maKM, km.tenKM, km.ngayBatDau, km.ngayKetThuc,

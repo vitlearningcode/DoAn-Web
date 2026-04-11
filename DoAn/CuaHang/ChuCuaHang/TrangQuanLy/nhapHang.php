@@ -2,6 +2,9 @@
 // ══════════════════════════════════════════════════════
 //  nhapHang.php — Quản lý phiếu nhập & công nợ NCC
 // ══════════════════════════════════════════════════════
+
+// [BẢO MẬT] Kiểm tra quyền Admin — chặn truy cập trực tiếp
+require_once __DIR__ . '/../_kiemTraQuyen.php';
 $tab = $_GET['tab'] ?? 'phieu';
 
 try {

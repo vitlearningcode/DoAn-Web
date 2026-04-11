@@ -824,3 +824,103 @@
     color: #ef4444;
     font-size: 13px;
 }
+
+/* ══════════════════════════════════════════════════════
+   FLASH SALE — Thanh tiến độ đã bán (Shopee-style)
+   Usage: SihI9B > Ko7byE > [_BlLSM + f62M8e + DOdbJB]
+   ══════════════════════════════════════════════════════ */
+
+/* Grid: mỗi cột = 1 book-card + 1 SihI9B ngay dưới */
+.flash-sale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px 16px;
+    /* subgrid trick: book-card + progress bar cùng 1 cell */
+    align-items: start;
+}
+
+/* Wrapper ngoài cùng — dính sát đáy card */
+.SihI9B {
+    margin-top: -8px;
+    margin-bottom: 4px;
+    padding: 0 2px;
+}
+
+/* Track chứa toàn bộ thanh + label */
+.Ko7byE {
+    position: relative;
+    height: 16px;               /* y hệt Shopee */
+    background: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Phần đã bán (cam → đỏ) ── */
+.f62M8e {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #ff7337, #ee4d2d);
+    /* border-radius được set inline tùy % */
+    transition: width 0.5s ease;
+    min-width: 4px;
+}
+
+/* ── Phần còn lại (xám nhạt) ── */
+.DOdbJB {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: transparent;   /* Ko7byE đã có màu nền */
+}
+
+/* ── Nhãn text nổi trên thanh ── */
+.cx1ruZ {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Nhãn chính: "ĐANG BÁN CHẠY" / "CHỈ CÒN X" / "GẦN HẾT HÀNG" */
+._BlLSM {
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.02em;
+}
+
+/* Spacer bên trái khi có nhãn "CHỈ CÒN X" (đẩy text vào phần cam) */
+.LUjUEs {
+    background: transparent;
+}
+
+/* ══════════════════════════════════════════════════════
+   CART TOAST — Trạng thái active + màu cảnh báo vàng
+   ══════════════════════════════════════════════════════ */
+.cart-toast.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Toast cảnh báo tồn kho thấp — nền vàng */
+.cart-toast.toast-warning .toast-content {
+    background: #78350f;
+    border-color: #92400e;
+}
+
+.cart-toast.toast-warning .toast-icon-wrapper {
+    background: rgba(251, 191, 36, 0.25);
+}

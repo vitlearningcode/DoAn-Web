@@ -2,7 +2,8 @@
 // ══════════════════════════════════════════════════════
 //  xoaSach.php — Xóa hoặc toggle trạng thái sách
 // ══════════════════════════════════════════════════════
-session_start();
+// [BẢO MẬT] Kiểm tra quyền Admin trước tiên
+require_once __DIR__ . '/../../_kiemTraQuyen.php';
 require_once '../../../KetNoi/config/db.php';
 
 function redirectSach(string $msg, string $loai = 'success'): never {
