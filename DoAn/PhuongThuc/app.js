@@ -145,7 +145,7 @@ function timKiemNhanh(tuKhoa) {
     duLieuGuiDi.append('tu_khoa', tuKhoa);
 
     // CẬP NHẬT ĐƯỜNG DẪN MỚI TRỎ VÀO THƯ MỤC GIAO DIỆN
-    fetch('CuaHang/TrangBanHang/GiaoDien/xuly_timkiem_nhanh.php', {
+    fetch(DUONG_DAN_GOC_JS + 'CuaHang/TrangBanHang/GiaoDien/xuly_timkiem_nhanh.php', {
         method: 'POST',
         body: duLieuGuiDi
     })
@@ -193,7 +193,7 @@ function thayDoiYeuThich(su_kien, nut_bam) {
     du_lieu_gui_di.append('ma_sach', ma_sach);
 
     // CẬP NHẬT ĐƯỜNG DẪN MỚI TẠI ĐÂY
-    fetch('CuaHang/TrangBanHang/GiaoDien/xuly_yeuthich.php', {
+    fetch(DUONG_DAN_GOC_JS + 'CuaHang/TrangBanHang/GiaoDien/xuly_yeuthich.php', {
         method: 'POST',
         body: du_lieu_gui_di
     })

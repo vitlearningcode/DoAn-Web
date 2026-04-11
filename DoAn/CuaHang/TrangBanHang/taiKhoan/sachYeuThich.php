@@ -69,10 +69,15 @@ $danhSachYeuThich = $lenhThucThi->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 </main>
 
+<?php include_once "../../../CuaHang/TrangBanHang/GioHang/formGioHang.php"; ?>
+<?php include_once "../ChiTietSach/formXemNhanhSach.php"; ?>
+
 <?php include_once "../GiaoDien/footer.php"; ?>
 
-<script src="../../../PhuongThuc/app.js"></script>
-<script src="../../../PhuongThuc/btnThemGioHang.js"></script>
+<script src="<?= $duong_dan_goc ?>PhuongThuc/app.js"></script>
+<script src="<?= $duong_dan_goc ?>PhuongThuc/cart.js"></script>
+<script src="<?= $duong_dan_goc ?>PhuongThuc/btnThemGioHang.js"></script>
+<script src="<?= $duong_dan_goc ?>PhuongThuc/xemNhanhSach.js"></script>
 
 </body>
 </html>
