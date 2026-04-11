@@ -2,7 +2,7 @@
     <div class="top-bar">
         <div class="container">
             <marquee width="100%" behavior="alternate" scrollamount="2">  
-    <p style="font-size: 11pt;">Sách không tự mất đi, nó chỉ chuyển từ chỗ này sang chỗ khác (nếu có chúng tôi)</p>
+    <p style="font-size: 11pt;">Sách không tự mất đi, nó chỉ chuyển từ chỗ này sang chỗ khác (nếu chúng tôi có)</p>
 </marquee>
             <div class="top-bar-links">
                 <a href="#">Theo dõi đơn hàng</a>
