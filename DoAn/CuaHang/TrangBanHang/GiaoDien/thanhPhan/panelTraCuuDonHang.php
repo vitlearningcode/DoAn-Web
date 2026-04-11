@@ -13,7 +13,7 @@
         <h3>Theo Dõi Đơn Hàng</h3>
         <p>Nhập mã đơn hàng hoặc số điện thoại để tra cứu.</p>
     </div>
-    <form class="panel-tra-cuu__form" action="CuaHang/TrangBanHang/donHang/traDoc.php" method="POST">
+    <form class="panel-tra-cuu__form" action="<?= $duong_dan_goc ?>CuaHang/TrangBanHang/donHang/traDoc.php" method="POST">
         <div class="panel-tra-cuu__nhom">
             <label for="tra-cuu-ma-don">Mã đơn hàng</label>
             <input type="text" id="tra-cuu-ma-don" name="ma_don_hang" placeholder="VD: DH1745000012" autocomplete="off">

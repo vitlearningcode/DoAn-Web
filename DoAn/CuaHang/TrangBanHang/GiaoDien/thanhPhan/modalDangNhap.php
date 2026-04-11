@@ -73,13 +73,15 @@
 <div id="logout-modal" class="auth-modal logout-size">
     <div class="modal-header">
         <h2>Xác nhận đăng xuất</h2>
-        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <span class="close-btn" onclick="closeModal()" id="logout-modal-close">&times;</span>
     </div>
     <div class="modal-body" style="text-align: center; margin-top: 15px;">
         <p style="font-size: 15px; color: #333; margin-bottom: 30px;">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?</p>
         <div class="input-group" style="display: flex; justify-content: space-between; width: 343px; margin: 0 auto;">
-            <button type="button" class="btn-cancel" onclick="closeModal()">Hủy bỏ</button>
-            <a href="<?= $duong_dan_goc ?>xuly_dangxuat.php" class="btn-confirm">Đăng xuất</a>
+            <button type="button" class="btn-cancel" id="logout-cancel" onclick="closeModal()">Hủy bỏ</button>
+            <!-- Dùng href tuyệt đối → đúng từ mọi trang. JS xacNhanDangXuat.js cũng gắn listener vào đây -->
+            <a href="<?= $duong_dan_goc ?>xuly_dangxuat.php" class="btn-confirm" id="logout-confirm">Đăng xuất</a>
         </div>
     </div>
 </div>
+

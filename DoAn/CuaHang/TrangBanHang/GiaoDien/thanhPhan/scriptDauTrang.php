@@ -2,6 +2,7 @@
 /**
  * scriptDauTrang.php — Script JS cho phần đầu trang
  * Chứa: moTraCuuDonHang, dongTraCuuDonHang, moHoTro, dongHoTro
+ * + Patch xacNhanDangXuat để dùng URL tuyệt đối từ PHP ($duong_dan_goc)
  * Không có AJAX, không innerHTML — chỉ toggle class/style
  */
 ?>
@@ -29,4 +30,22 @@ function dongHoTro() {
     document.getElementById('overlay-ho-tro').classList.remove('hien');
     document.body.style.overflow = '';
 }
+</script>
+
+<?php /* ── Patch xacNhanDangXuat.js: override đường dẫn tuyệt đối (PHP render, không AJAX) ── */ ?>
+<script>
+/*
+ * xacNhanDangXuat.js hardcode "xuly_dangxuat.php" (tương đối) → sai khi gọi từ trang con.
+ * Patch: ghi đè xuLyXacNhan() sau khi file JS đã load, dùng đường dẫn
+ * tuyệt đối do PHP render ở đây.
+ * Chạy sau DOMContentLoaded (defer-safe) để đảm bảo xacNhanDangXuat đã khởi tạo.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof xacNhanDangXuat !== 'undefined') {
+        xacNhanDangXuat.xuLyXacNhan = function () {
+            this.dong();
+            window.location.href = '<?= $duong_dan_goc ?>xuly_dangxuat.php';
+        };
+    }
+});
 </script>

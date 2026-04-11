@@ -13,7 +13,8 @@ if (!empty($_SESSION['cart'])) {
 }
 
 if (empty($gioHang)) {
-    echo "<script>alert('Giỏ hàng trống hoặc phiên giao dịch đã hết hạn!'); window.location.href='../../index.php';</script>";
+    // Dùng đường dẫn tuyệt đối để JS redirect đúng từ mọi thư mục
+    echo "<script>alert('Giỏ hàng trống hoặc phiên giao dịch đã hết hạn!'); window.location.href='/DoAn-Web/DoAn/index.php';</script>";
     exit;
 }
 

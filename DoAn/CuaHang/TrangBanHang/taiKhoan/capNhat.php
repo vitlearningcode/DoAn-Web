@@ -73,11 +73,11 @@ require_once 'layThongTinTaiKhoan.php';
 function toggleUserMenu(e) {
     e.stopPropagation();
     var menuNguoiDung = document.getElementById('userDropdown');
-    if (menuNguoiDung) menuNguoiDung.classList.toggle('open');
+    if (menuNguoiDung) menuNguoiDung.classList.toggle('show');
 }
 document.addEventListener('click', function() {
     var menuNguoiDung = document.getElementById('userDropdown');
-    if (menuNguoiDung) menuNguoiDung.classList.remove('open');
+    if (menuNguoiDung) menuNguoiDung.classList.remove('show');
 });
 </script>
 </body>
