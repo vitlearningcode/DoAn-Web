@@ -94,44 +94,47 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
             </div>
             <div class="books-grid flash-sale-grid">
                 <?php foreach ($ds_flashsale as $sach):
+                    // ── Tính toán thanh tiến độ kiểu Shopee ────────────────
+                    $tongBan   = (int)($sach['tongBan'] ?? 0);
+                    $soLuongKM = (int)($sach['soLuongKhuyenMai'] ?? 0);
+                    $conLai    = (int)($sach['soLuongTon'] ?? 0);
+                    $tongBanDau = ($soLuongKM > 0) ? $soLuongKM : max(1, $tongBan + $conLai);
+                    $pctDaBan   = min(100, round($tongBan / $tongBanDau * 100));
+                    $pctConLai  = 100 - $pctDaBan;
+
+                    $gapHet  = ($conLai <= 5 && $conLai > 0);
+                    $sapHet  = (!$gapHet && $pctDaBan >= 80);
+                    $isPopular = (!$gapHet && !$sapHet);
+
+                    // Chuẩn bị HTML label cho thanh
+                    $progressLabelHtml = '';
+                    if ($isPopular) {
+                        $progressLabelHtml = '<div class="_BlLSM cx1ruZ">ĐANG BÁN CHẠY</div>';
+                    } elseif ($gapHet) {
+                        $progressLabelHtml = '<div class="LUjUEs cx1ruZ"></div><div class="_BlLSM cx1ruZ">CHỈ CÒN ' . $conLai . '</div>';
+                    } else {
+                        $progressLabelHtml = '<div class="_BlLSM cx1ruZ">GẦN HẾT HÀNG</div>';
+                    }
+
+                    $borderRadiusDaBan = $pctDaBan >= 100 ? '8px' : '8px 0 0 8px';
+
+                    // Khối HTML customBottom sẽ được chèn vào trong bookCard
+                    $customHtmlBottom = "
+                    <div class=\"SihI9B\">
+                        <div class=\"Ko7byE\">
+                            {$progressLabelHtml}
+                            <div class=\"f62M8e\" style=\"width: {$pctDaBan}%; border-radius: {$borderRadiusDaBan};\"></div>
+                            <div class=\"DOdbJB\" style=\"border-radius: 8px;\"></div>
+                        </div>
+                    </div>";
+
                     /* Badge 1 (cam): nhãn "Flash Sale"
                        Badge 2 (đỏ): "-XX%" — phanTramGiam thực từ ChiTietKhuyenMai */
                     echo hienThiTheSach($sach, [
                         ['class' => 'label-type',    'label' => 'Flash Sale'],
                         ['class' => 'label-discount', 'label' => '-' . $sach['phanTramGiam'] . '%'],
-                    ]);
-
-                    // ── Tính toán thanh tiến độ kiểu Shopee ────────────────
-                    $tongBan   = (int)($sach['tongBan'] ?? 0);
-                    $soLuongKM = (int)($sach['soLuongKhuyenMai'] ?? 0);
-                    $conLai    = (int)($sach['soLuongTon'] ?? 0);
-                    // Tổng ban đầu = lấy soLuongKM nếu có, không thì đã bán + còn tồn
-                    $tongBanDau = ($soLuongKM > 0) ? $soLuongKM : max(1, $tongBan + $conLai);
-                    $pctDaBan   = min(100, round($tongBan / $tongBanDau * 100));
-                    $pctConLai  = 100 - $pctDaBan;   // phần xám (còn lại)
-
-                    // Xác định loại nhãn
-                    $gapHet  = ($conLai <= 5 && $conLai > 0);
-                    $sapHet  = (!$gapHet && $pctDaBan >= 80);
-                    // Nhãn "ĐANG BÁN CHẠY" hiện khi ít bán (< 80%)
-                    $isPopular = (!$gapHet && !$sapHet);
-                ?>
-                <?php /* ── HTML y hệt Shopee ── */ ?>
-                <div class="SihI9B">
-                    <div class="Ko7byE">
-                        <?php if ($isPopular): ?>
-                            <div class="_BlLSM cx1ruZ">ĐANG BÁN CHẠY</div>
-                        <?php elseif ($gapHet): ?>
-                            <div class="LUjUEs cx1ruZ"></div>
-                            <div class="_BlLSM cx1ruZ">CHỈ CÒN <?= $conLai ?></div>
-                        <?php else: ?>
-                            <div class="_BlLSM cx1ruZ">GẦN HẾT HÀNG</div>
-                        <?php endif; ?>
-                        <div class="f62M8e" style="width: <?= $pctDaBan ?>%; border-radius: <?= $pctDaBan >= 100 ? '8px' : '8px 0 0 8px' ?>;"></div>
-                        <div class="DOdbJB" style="border-radius: 8px;"></div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
+                    ], $customHtmlBottom);
+                endforeach; ?>
             </div>
         </div>
     </section>
