@@ -15,7 +15,7 @@
  * @param array $nhanHieu  Danh sách nhãn [['class'=>'...','label'=>'...']]
  * @return string          HTML card sách
  */
-function hienThiTheSach(array $sach, array $nhanHieu = []): string
+function hienThiTheSach(array $sach, array $nhanHieu = [], string $customHtmlBottom = ''): string
 {
     // ── Dữ liệu cơ bản ──────────────────────────────────────────────────
     $anh        = !empty($sach['hinhAnh'])  ? htmlspecialchars($sach['hinhAnh'], ENT_QUOTES)
@@ -103,7 +103,7 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
 
         <!-- Nút phải: tim + mắt — ẩn, slide-in khi hover -->
         <div class=\"book-actions-right\">
-            <button class=\"btn-action-icon btn-wishlist\" title=\"Yêu thích\">
+            <button class=\"btn-action-icon btn-wishlist\" title=\"Yêu thích\" onclick=\"thayDoiYeuThich(event, this)\">
                 <i class=\"far fa-heart\"></i>
             </button>
             <button class=\"btn-action-icon btn-quickview\" title=\"Xem nhanh\">
@@ -133,6 +133,7 @@ function hienThiTheSach(array $sach, array $nhanHieu = []): string
                 <i class=\"fas fa-shopping-cart\"></i>
             </button>
         </div>
+        {$customHtmlBottom}
     </div>
 </div>";
 }
