@@ -78,6 +78,7 @@ $danhSachYeuThich = $lenhThucThi->fetchAll(PDO::FETCH_ASSOC);
 <script src="<?= $duong_dan_goc ?>PhuongThuc/cart.js"></script>
 <script src="<?= $duong_dan_goc ?>PhuongThuc/btnThemGioHang.js"></script>
 <script src="<?= $duong_dan_goc ?>PhuongThuc/xemNhanhSach.js"></script>
+<script src="<?= $duong_dan_goc ?>PhuongThuc/components/chatbot.js" defer></script>
 
 </body>
 </html>
