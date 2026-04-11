@@ -72,7 +72,8 @@ if (isset($pdo)) {
         <div class="adm-nav-section">
             <p class="adm-nav-section-label">Tổng quan</p>
             <a href="<?= $adminUrl ?>?trang=tongQuan"
-               class="adm-nav-item<?= navActive('tongQuan', $trangHienTai) ?>">
+               class="adm-nav-item<?= navActive('tongQuan', $trangHienTai) ?>"
+               title="Tổng quan">
                 <i class="fas fa-chart-pie"></i>
                 <span>Tổng quan</span>
             </a>
@@ -81,7 +82,8 @@ if (isset($pdo)) {
         <div class="adm-nav-section">
             <p class="adm-nav-section-label">Kinh doanh</p>
             <a href="<?= $adminUrl ?>?trang=donHang"
-               class="adm-nav-item<?= navActive('donHang', $trangHienTai) ?>">
+               class="adm-nav-item<?= navActive('donHang', $trangHienTai) ?>"
+               title="Đơn hàng">
                 <i class="fas fa-shopping-bag"></i>
                 <span>Đơn hàng</span>
                 <?php if ($soDonChoDuyet > 0): ?>
@@ -94,12 +96,14 @@ if (isset($pdo)) {
                 <span>Sách & Tồn kho</span>
             </a>
             <a href="<?= $adminUrl ?>?trang=nhapHang"
-               class="adm-nav-item<?= navActive('nhapHang', $trangHienTai) ?>">
+               class="adm-nav-item<?= navActive('nhapHang', $trangHienTai) ?>"
+               title="Nhập hàng">
                 <i class="fas fa-truck"></i>
                 <span>Nhập hàng</span>
             </a>
             <a href="<?= $adminUrl ?>?trang=khuyenMai"
-               class="adm-nav-item<?= navActive('khuyenMai', $trangHienTai) ?>">
+               class="adm-nav-item<?= navActive('khuyenMai', $trangHienTai) ?>"
+               title="Khuyến mãi">
                 <i class="fas fa-tags"></i>
                 <span>Khuyến mãi</span>
             </a>
@@ -108,7 +112,8 @@ if (isset($pdo)) {
         <div class="adm-nav-section">
             <p class="adm-nav-section-label">Hệ thống</p>
             <a href="<?= $adminUrl ?>?trang=taiKhoan"
-               class="adm-nav-item<?= navActive('taiKhoan', $trangHienTai) ?>">
+               class="adm-nav-item<?= navActive('taiKhoan', $trangHienTai) ?>"
+               title="Tài khoản">
                 <i class="fas fa-users"></i>
                 <span>Tài khoản</span>
             </a>
@@ -118,11 +123,11 @@ if (isset($pdo)) {
 
     <!-- Footer -->
     <div class="adm-sidebar-footer">
-        <a href="../../index.php" class="adm-nav-item" title="Xem trang bán hàng">
+        <a href="../../index.php" class="adm-nav-item" title="Trang bán hàng">
             <i class="fas fa-store"></i>
             <span>Trang bán hàng</span>
         </a>
-        <a href="../../xuly_dangxuat.php" class="adm-nav-item logout">
+        <a href="../../xuly_dangxuat.php" class="adm-nav-item logout" title="Đăng xuất">
             <i class="fas fa-sign-out-alt"></i>
             <span>Đăng xuất</span>
         </a>
