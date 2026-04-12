@@ -4,8 +4,7 @@
  * Kích hoạt khi: $_POST['hanh_dong_dia_chi'] được gửi
  * Hành động: them_moi | dat_mac_dinh | xoa_dia_chi
  *
- * Input:  $_POST (hanh_dong_dia_chi, dia_chi_moi, la_mac_dinh, ma_dc)
- * Output: $thongBao (string), $loaiThongBao (string: 'success'|'error')
+ * PRG Pattern: sau khi xử lý → redirect về capNhat.php?trang=dia-chi&tb=...
  * Yêu cầu: $pdo, $maND đã khai báo
  */
 
@@ -23,12 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hanh_dong_dia_chi']))
             }
             $pdo->prepare("INSERT INTO DiaChiGiaoHang (maND, diaChiChiTiet, laMacDinh) VALUES (?, ?, ?)")
                 ->execute([$maND, $diaChiMoi, $laMacDinh]);
-            $thongBao     = 'Đã thêm địa chỉ mới thành công!';
-            $loaiThongBao = 'success';
+            header('Location: capNhat.php?trang=dia-chi&tb=them_ok');
         } else {
-            $thongBao     = 'Địa chỉ không được để trống.';
-            $loaiThongBao = 'error';
+            header('Location: capNhat.php?trang=dia-chi&tb=' . urlencode('Địa chỉ không được để trống.'));
         }
+        exit;
 
     // ── Đặt địa chỉ mặc định ──────────────────────────────────────────────────
     } elseif ($hanhDong === 'dat_mac_dinh') {
@@ -39,12 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hanh_dong_dia_chi']))
         if ($stmtKiemTra->fetch()) {
             $pdo->prepare("UPDATE DiaChiGiaoHang SET laMacDinh = 0 WHERE maND = ?")->execute([$maND]);
             $pdo->prepare("UPDATE DiaChiGiaoHang SET laMacDinh = 1 WHERE maDC = ? AND maND = ?")->execute([$maDiaChi, $maND]);
-            $thongBao     = 'Đã đặt làm địa chỉ mặc định.';
-            $loaiThongBao = 'success';
+            header('Location: capNhat.php?trang=dia-chi&tb=mac_dinh_ok');
         } else {
-            $thongBao     = 'Không tìm thấy địa chỉ.';
-            $loaiThongBao = 'error';
+            header('Location: capNhat.php?trang=dia-chi&tb=' . urlencode('Không tìm thấy địa chỉ.'));
         }
+        exit;
 
     // ── Xóa địa chỉ ───────────────────────────────────────────────────────────
     } elseif ($hanhDong === 'xoa_dia_chi') {
@@ -55,26 +52,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hanh_dong_dia_chi']))
         $stmtKT->execute([$maDiaChi, $maND]);
 
         if (!$stmtKT->fetch()) {
-            $thongBao     = 'Không tìm thấy địa chỉ hoặc bạn không có quyền xóa.';
-            $loaiThongBao = 'error';
-        } else {
-            // Bước 2: Kiểm tra xem địa chỉ có đang được dùng trong đơn hàng nào không
-            $stmtDH = $pdo->prepare("SELECT COUNT(*) FROM DonHang WHERE maDC = ?");
-            $stmtDH->execute([$maDiaChi]);
-            $soLuongDH = (int)$stmtDH->fetchColumn();
-
-            if ($soLuongDH > 0) {
-                // Địa chỉ đang gắn với đơn hàng → không cho xóa
-                $thongBao     = 'Không thể xóa địa chỉ này vì đang được dùng trong '
-                              . $soLuongDH . ' đơn hàng. Vui lòng chọn địa chỉ khác làm mặc định.';
-                $loaiThongBao = 'error';
-            } else {
-                // An toàn để xóa
-                $pdo->prepare("DELETE FROM DiaChiGiaoHang WHERE maDC = ? AND maND = ?")
-                    ->execute([$maDiaChi, $maND]);
-                $thongBao     = 'Đã xóa địa chỉ thành công.';
-                $loaiThongBao = 'success';
-            }
+            header('Location: capNhat.php?trang=dia-chi&tb=' . urlencode('Không tìm thấy địa chỉ hoặc bạn không có quyền xóa.'));
+            exit;
         }
+
+        // Bước 2: Kiểm tra địa chỉ có đang dùng trong đơn hàng không
+        $stmtDH = $pdo->prepare("SELECT COUNT(*) FROM DonHang WHERE maDC = ?");
+        $stmtDH->execute([$maDiaChi]);
+        $soLuongDH = (int)$stmtDH->fetchColumn();
+
+        if ($soLuongDH > 0) {
+            $tb = 'Không thể xóa — địa chỉ đang dùng trong ' . $soLuongDH . ' đơn hàng.';
+            header('Location: capNhat.php?trang=dia-chi&tb=' . urlencode($tb));
+        } else {
+            $pdo->prepare("DELETE FROM DiaChiGiaoHang WHERE maDC = ? AND maND = ?")
+                ->execute([$maDiaChi, $maND]);
+            header('Location: capNhat.php?trang=dia-chi&tb=xoa_ok');
+        }
+        exit;
     }
 }
