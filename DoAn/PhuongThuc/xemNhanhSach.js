@@ -1,11 +1,15 @@
 /**
- * xemNhanhSach.js — v2
+ * xemNhanhSach.js — v3
  * Modal "Xem Nhanh Sách"
  *
  * ✅ KHÔNG innerHTML — chỉ textContent / setAttribute / className / style
  * ✅ KHÔNG AJAX — KHÔNG JSON
  *    → Mọi dữ liệu đọc từ data-* của .book-card (PHP render ra trang)
- * ✅Gắn click lên .book-card, bỏ qua các nút: .btn-add-to-cart .btn-add-quick .btn-action-icon
+ *
+ * v3 thay đổi:
+ *   - Click .btn-quickview (nút mắt) → mở modal xem nhanh
+ *   - Click .book-card (vùng còn lại) → điều hướng đến trang chi tiết sách
+ *   - Bỏ qua: .btn-add-to-cart, .btn-add-quick, .btn-action-icon
  */
 
 (function () {
@@ -47,11 +51,54 @@
     if (e.key === 'Escape' && overlay.classList.contains('active')) dongModal();
   });
 
-  // ── Gắn click cho tất cả .book-card ──────────────────────────────────
-  document.querySelectorAll('.book-card').forEach(function (card) {
-    card.addEventListener('click', function (e) {
+  // ── Hàm đọc dữ liệu từ card và điền vào modal ────────────────────────
+  function docDuLieuCard(card) {
+    var chiTiet = {
+      maSach      : card.getAttribute('data-id')         || '',
+      tenSach     : card.getAttribute('data-name')       || 'Chưa có tên',
+      hinhAnh     : card.getAttribute('data-image')      || '',
+      giaHienTai  : card.getAttribute('data-price')      || '0',
+      giaBan      : card.getAttribute('data-gia-ban')    || '0',
+      phanTramGiam: card.getAttribute('data-giam')       || '',
+      tacGia      : card.getAttribute('data-tac-gia')    || 'Đang cập nhật',
+      theLoai     : card.getAttribute('data-the-loai')   || '',
+      diemTB      : card.getAttribute('data-diem')       || '0',
+      soReview    : card.getAttribute('data-reviews')    || '0',
+      tongBan     : card.getAttribute('data-da-ban')     || '0',
+      moTa        : card.getAttribute('data-mo-ta')      || '',
+      nhaXuatBan  : card.getAttribute('data-nxb')        || '',
+      namSX       : card.getAttribute('data-nam-sx')     || '',
+      hinhThucBia : card.getAttribute('data-bia')        || '',
+      tonKho      : card.getAttribute('data-ton-kho')    || '',
+    };
 
-      // Bỏ qua: nút thêm giỏ, thêm nhanh, icon tim/mắt
+    // Nhãn từ card (BÁN CHẠY / FLASH SALE / MỚI…)
+    var nhanLoaiEl = card.querySelector('.book-badge.label-type');
+    var nhanGiamEl = card.querySelector('.book-badge.label-discount');
+    chiTiet.nhanLoai = nhanLoaiEl ? nhanLoaiEl.textContent.trim() : '';
+    chiTiet.nhanGiam = nhanGiamEl ? nhanGiamEl.textContent.trim() : '';
+
+    return chiTiet;
+  }
+
+  // ── Gắn sự kiện cho tất cả .book-card ────────────────────────────────
+  document.querySelectorAll('.book-card').forEach(function (card) {
+
+    // 1. Nút mắt (btn-quickview) → mở modal xem nhanh
+    var nutMat = card.querySelector('.btn-quickview');
+    if (nutMat) {
+      nutMat.addEventListener('click', function (e) {
+        e.stopPropagation(); // Không cho click lan ra card
+        sachHienTai = docDuLieuCard(card);
+        soLuong = 1;
+        moModal();
+        dienDuLieu(sachHienTai);
+      });
+    }
+
+    // 2. Click vào card → điều hướng trang chi tiết
+    //    (bỏ qua các nút: thêm giỏ, thêm nhanh, tim, mắt)
+    card.addEventListener('click', function (e) {
       if (
         e.target.closest('.btn-add-to-cart') ||
         e.target.closest('.btn-add-quick')   ||
@@ -60,38 +107,14 @@
         return;
       }
 
-      // Đọc toàn bộ dữ liệu từ data-* của card (PHP đã render sẵn)
-      var chiTiet = {
-        maSach      : card.getAttribute('data-id')         || '',
-        tenSach     : card.getAttribute('data-name')       || 'Chưa có tên',
-        hinhAnh     : card.getAttribute('data-image')      || '',
-        giaHienTai  : card.getAttribute('data-price')      || '0',   // giá hiện tại (đã giảm hoặc gốc)
-        giaBan      : card.getAttribute('data-gia-ban')    || '0',   // giá gốc trước giảm
-        phanTramGiam: card.getAttribute('data-giam')       || '',    // % giảm, rỗng = không giảm
-        tacGia      : card.getAttribute('data-tac-gia')   || 'Đang cập nhật',
-        theLoai     : card.getAttribute('data-the-loai')  || '',
-        diemTB      : card.getAttribute('data-diem')       || '0',
-        soReview    : card.getAttribute('data-reviews')   || '0',
-        tongBan     : card.getAttribute('data-da-ban')     || '0',
-        moTa        : card.getAttribute('data-mo-ta')      || '',
-        nhaXuatBan  : card.getAttribute('data-nxb')        || '',
-        namSX       : card.getAttribute('data-nam-sx')     || '',
-        hinhThucBia : card.getAttribute('data-bia')        || '',
-        tonKho      : card.getAttribute('data-ton-kho')    || '',
-      };
+      var maSach = card.getAttribute('data-id');
+      if (!maSach) return;
 
-      // Nhãn từ card (BÁN CHẠY / FLASH SALE / MỚI…)
-      var nhanLoaiEl = card.querySelector('.book-badge.label-type');
-      var nhanGiamEl = card.querySelector('.book-badge.label-discount');
-      chiTiet.nhanLoai = nhanLoaiEl ? nhanLoaiEl.textContent.trim() : '';
-      chiTiet.nhanGiam = nhanGiamEl ? nhanGiamEl.textContent.trim() : '';
-
-      sachHienTai = chiTiet;
-      soLuong = 1;
-
-      moModal();
-      dienDuLieu(chiTiet);
+      // Xây dựng URL trang chi tiết (tương đối từ gốc site)
+      var url = DUONG_DAN_GOC_JS + 'CuaHang/TrangBanHang/ChiTietSach/layChiTietSach.php?maSach=' + encodeURIComponent(maSach);
+      window.location.href = url;
     });
+
   });
 
   // ── Điền dữ liệu vào modal (không innerHTML) ─────────────────────────
@@ -132,7 +155,7 @@
       hien('mn-dg-sep-1');
     } else {
       datVan('mn-so-review', 'Chưa có đánh giá');
-      an('mn-dg-sep-1');  // ẩn dấu · trước nếu không có điểm
+      an('mn-dg-sep-1');
     }
 
     // Tổng đã bán
@@ -266,7 +289,6 @@
   var nutYeuThich = document.getElementById('mn-yeu-thich');
   if (nutYeuThich) {
     nutYeuThich.addEventListener('click', function () {
-      // Toggle fill cho SVG heart (không innerHTML — dùng setAttribute)
       var svg = nutYeuThich.querySelector('svg');
       if (!svg) return;
       var daThich = nutYeuThich.classList.toggle('dang-thich');
@@ -291,7 +313,6 @@
   }
 
   // ── Panel Đánh Giá (click số review → hiện iframe PHP) ──────────────────────
-  // JS chỉ gán src iframe + toggle display — KHÔNG innerHTML, KHÔNG fetch/AJAX
   var nutSoReview  = document.getElementById('mn-so-review');
   var panelDanhGia = document.getElementById('mn-panel-danh-gia');
   var iframeDG     = document.getElementById('mn-iframe-danh-gia');
@@ -300,10 +321,9 @@
   if (nutSoReview && panelDanhGia && iframeDG) {
     function moPanel() {
       if (!sachHienTai || !sachHienTai.maSach) return;
-      // Gán src iframe → PHP layDanhGia.php render HTML danh sách review
       iframeDG.setAttribute(
         'src',
-        DUONG_DAN_GOC_JS +'CuaHang/TrangBanHang/ChiTietSach/layDanhGia.php?maSach=' + encodeURIComponent(sachHienTai.maSach)
+        DUONG_DAN_GOC_JS + 'CuaHang/TrangBanHang/ChiTietSach/layDanhGia.php?maSach=' + encodeURIComponent(sachHienTai.maSach)
       );
       panelDanhGia.style.display = '';
     }
@@ -313,7 +333,6 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); moPanel(); }
     });
 
-    // Nút đóng panel
     if (nutDongPanel) {
       nutDongPanel.addEventListener('click', function() {
         panelDanhGia.style.display = 'none';
