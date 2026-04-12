@@ -7,7 +7,7 @@
  *   2. Đơn hàng phải thuộc về khách này
  *   3. Trạng thái phải là 'ChoDuyet'
  *
- * Sau khi hủy: hoàn lại tồn kho (Transaction) → redirect về donHang/index.php
+ * Sau khi hủy: hoàn lại tồn kho (Transaction) → redirect về donHang/theoDoiDonHang.php
  * Thuần PHP — không AJAX.
  */
 session_start();
@@ -15,7 +15,7 @@ require_once '../../../KetNoi/config/db.php';
 
 // Hàm redirect kèm thông báo
 function redirectVeDonHang(string $tab = 'cho-duyet', string $tb = ''): never {
-    $url = 'index.php?tab=' . urlencode($tab);
+    $url = 'theoDoiDonHang.php?tab=' . urlencode($tab);
     if ($tb !== '') $url .= '&tb=' . urlencode($tb);
     header('Location: ' . $url);
     exit;

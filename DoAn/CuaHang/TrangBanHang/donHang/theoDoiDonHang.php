@@ -1,6 +1,6 @@
 <?php
 /**
- * donHang/index.php — Trang theo dõi đơn hàng (Entry Point)
+ * donHang/theoDoiDonHang.php — Trang theo dõi đơn hàng
  * Tabs: Tất cả | Chờ Duyệt | Đang Giao | Đã Giao | Đã Hủy | Đánh Giá
  * Thuần PHP: không AJAX, không chèn HTML từ JS.
  * Mỗi chức năng được tách thành file riêng và gọi qua require_once.
