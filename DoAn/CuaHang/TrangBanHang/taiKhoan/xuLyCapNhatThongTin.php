@@ -9,12 +9,12 @@
  */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hanh_dong_thong_tin'])) {
-    $hoTen    = trim($_POST['hoten']  ?? '');
-    $soDienThoai = trim($_POST['sdt'] ?? '');
-    $email    = trim($_POST['email']  ?? '');
-    $matKhauCu  = trim($_POST['mk_cu']  ?? '');
-    $matKhauMoi = trim($_POST['mk_moi'] ?? '');
-    $matKhauXacNhan = trim($_POST['mk_xn'] ?? '');
+    $hoTen           = trim($_POST['hoten']  ?? '');
+    $soDienThoai     = trim($_POST['sdt']    ?? '');
+    $email           = trim($_POST['email']  ?? '');
+    $matKhauCu       = trim($_POST['mk_cu']  ?? '');
+    $matKhauMoi      = trim($_POST['mk_moi'] ?? '');
+    $matKhauXacNhan  = trim($_POST['mk_xn']  ?? '');
 
     $danhSachLoi = [];
     if (empty($hoTen)) $danhSachLoi[] = 'Họ tên không được để trống.';
@@ -43,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hanh_dong_thong_tin']
         }
     }
 
+    // PRG: redirect với ?trang= để nhất quán với donHang/?tab=
     if (empty($danhSachLoi)) {
-        $thongBao     = 'Cập nhật thông tin thành công!';
-        $loaiThongBao = 'success';
+        header('Location: capNhat.php?trang=thong-tin&tb=cap_nhat_ok');
     } else {
-        $thongBao     = implode(' ', $danhSachLoi);
-        $loaiThongBao = 'error';
+        header('Location: capNhat.php?trang=thong-tin&tb=' . urlencode(implode(' ', $danhSachLoi)));
     }
+    exit;
 }
