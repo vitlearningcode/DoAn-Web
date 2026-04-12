@@ -2,7 +2,7 @@
 /**
  * donHang/xuly_danhGia.php — Lưu đánh giá sản phẩm vào DanhGiaSach
  *
- * Nhận POST từ form đánh giá trong trang donHang/index.php.
+ * Nhận POST từ form đánh giá trong trang donHang/theoDoiDonHang.php.
  * Kiểm tra: đã đăng nhập, đã mua sách, dữ liệu hợp lệ.
  * Thuần PHP form POST — không AJAX.
  */
@@ -17,7 +17,7 @@ if (!isset($_SESSION['nguoi_dung_id'])) {
 
 // Chỉ chấp nhận POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php');
+    header('Location: theoDoiDonHang.php');
     exit;
 }
 
@@ -70,6 +70,6 @@ if ($existing) {
 }
 
 // Redirect về trang đơn hàng với thông báo thành công
-header('Location: index.php?tab=da-giao&tb=ok');
+header('Location: theoDoiDonHang.php?tab=da-giao&tb=ok');
 exit;
 ?>

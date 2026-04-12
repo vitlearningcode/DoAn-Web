@@ -69,7 +69,7 @@
                             </div>
                             <ul class="dropdown-list">
                                 <li><a href="<?= $duong_dan_goc ?>CuaHang/TrangBanHang/taiKhoan/capNhat.php"><i class="fas fa-user-edit"></i> Sửa thông tin</a></li>
-                                <li><a href="<?= $duong_dan_goc ?>CuaHang/TrangBanHang/donHang/index.php"><i class="fas fa-box"></i> Theo dõi đơn hàng</a></li>
+                                <li><a href="<?= $duong_dan_goc ?>CuaHang/TrangBanHang/donHang/theoDoiDonHang.php"><i class="fas fa-box"></i> Theo dõi đơn hàng</a></li>
                                 <li>
                                     <a href="<?= $duong_dan_goc ?>CuaHang/TrangBanHang/taiKhoan/sachYeuThich.php">
                                         <i class="fas fa-heart" style="color: #ef4444;"></i> Sách yêu thích
