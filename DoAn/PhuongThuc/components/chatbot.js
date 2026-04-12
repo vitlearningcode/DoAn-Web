@@ -32,6 +32,8 @@ class TroLyAo {
   }
 
   khoiTao() {
+    
+
     this.thanhPhan.khungChinh = document.getElementById("chatbot");
     this.thanhPhan.nutMo = document.getElementById("chatbot-toggle");
     this.thanhPhan.khuVucTinNhan = document.getElementById("chatbot-messages");

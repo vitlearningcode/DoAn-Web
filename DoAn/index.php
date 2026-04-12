@@ -86,7 +86,7 @@ require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khoiDauTrangChu.php";
             <div class="flash-sale-header">
                 <div class="flash-sale-title">
                     <div class="flash-icon"><i class="fas fa-fire"></i></div>
-                    <div>
+                    <div> 
                         <h3>Flash Sale <span>Giá Sốc</span></h3>
                         <p>Kết thúc trong</p>
                     </div>
