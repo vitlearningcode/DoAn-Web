@@ -50,7 +50,7 @@ if (isset($_POST['tu_khoa'])) {
                     
                     // In ra thẻ HTML để hiển thị lên giao diện
                     echo '
-                    <a href="#" class="muc-ket-qua">
+                    <a href="/DoAn-Web/DoAn/CuaHang/TrangBanHang/ChiTietSach/layChiTietSach.php?maSach=' . urlencode($sach['maSach'] ?? '') . '" class="muc-ket-qua">
                         <img src="' . $anhHienThi . '" alt="' . $tenSach . '">
                         <div class="thong-tin-sach-tim-kiem">
                             <h4>' . $tenSach . '</h4>
