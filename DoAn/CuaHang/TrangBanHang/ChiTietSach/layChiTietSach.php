@@ -39,11 +39,9 @@ if ($maSach !== '') {
                 s.giaBan,
                 s.namSX,
                 s.moTa,
-                s.soTrang,
-                s.nhaXuatBan,
-                s.hinhThucBia,
-                s.kichThuoc,
+                s.loaiBia     AS hinhThucBia,
                 s.soLuongTon,
+                (SELECT tenNXB FROM NhaXuatBan nxb WHERE nxb.maNXB = s.maNXB) AS nhaXuatBan,
 
                 (SELECT urlAnh FROM HinhAnhSach
                  WHERE maSach = s.maSach LIMIT 1)                                  AS hinhAnh,
@@ -89,6 +87,8 @@ if ($maSach !== '') {
         $sach = $truyVan->fetch(PDO::FETCH_ASSOC);
 
     } catch (PDOException $loi) {
+        // DEV: ghi lỗi để debug
+        error_log('[layChiTietSach] PDOException: ' . $loi->getMessage());
         $sach = null;
     }
 
@@ -160,6 +160,9 @@ if ($maSach !== '') {
 $isLoggedIn    = isset($_SESSION['maNguoiDung']);
 $phai_xoa_cart = false;
 $duong_dan_goc = '/DoAn-Web/DoAn/';
+
+// ── Biến $tonKho luôn có giá trị mặc định ────────────────────────────────────
+$tonKho = 0;
 
 // Giá hiển thị
 $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
@@ -781,16 +784,7 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
                     <span class="ct-meta-label">Hình thức bìa</span>
                     <span class="ct-meta-value"><?= hienThiAn($sach['hinhThucBia'] ?? 'Đang cập nhật') ?></span>
                 </div>
-                <div class="ct-meta-row">
-                    <span class="ct-meta-label">Số trang</span>
-                    <span class="ct-meta-value"><?= $sach['soTrang'] ? (int)$sach['soTrang'] . ' trang' : 'Đang cập nhật' ?></span>
-                </div>
-                <?php if (!empty($sach['kichThuoc'])): ?>
-                <div class="ct-meta-row">
-                    <span class="ct-meta-label">Kích thước</span>
-                    <span class="ct-meta-value"><?= hienThiAn($sach['kichThuoc']) ?></span>
-                </div>
-                <?php endif; ?>
+
                 <div class="ct-meta-row">
                     <span class="ct-meta-label">Mã sách</span>
                     <span class="ct-meta-value"><?= hienThiAn($sach['maSach']) ?></span>
