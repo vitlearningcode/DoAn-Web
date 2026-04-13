@@ -12,6 +12,9 @@
 // THUẬT TOÁN SÁCH MỚI
 // ORDER BY namSX DESC, maSach DESC
 // ================================================================
+
+$limitSachMoi = isset($_GET['limit_sm']) ? max(10, (int)$_GET['limit_sm']) : 10;
+
 $ds_sachmoi = $pdo->query("
     SELECT
         s.maSach, s.tenSach, s.giaBan, s.namSX, s.moTa, s.loaiBia AS hinhThucBia, s.soLuongTon,
@@ -28,4 +31,6 @@ $ds_sachmoi = $pdo->query("
     FROM Sach s
     WHERE s.trangThai = 'DangKD'
     ORDER BY s.namSX DESC, s.maSach DESC
+    LIMIT $limitSachMoi
 ")->fetchAll(PDO::FETCH_ASSOC);
+?>
