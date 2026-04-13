@@ -9,7 +9,7 @@ $duong_dan_goc = '/DoAn-Web/DoAn/';
 
 // Đường dẫn lùi về thư mục gốc để gọi database và bookCard
 require_once '../../../KetNoi/config/db.php';
-require_once '../Components/bookCard.php';
+require_once 'thanhPhan/bookCard.php';
 
 function hienThiAn($chuoi, $macc = '') {
     return htmlspecialchars((string)($chuoi ?? $macc), ENT_QUOTES, 'UTF-8');

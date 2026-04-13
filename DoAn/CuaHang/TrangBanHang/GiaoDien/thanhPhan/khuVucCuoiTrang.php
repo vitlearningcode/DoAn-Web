@@ -37,10 +37,6 @@
             <div class="footer-newsletter">
                 <h4>Đăng Ký Nhận Tin</h4>
                 <p>Nhận thông tin về các chương trình khuyến mãi mới nhất.</p>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Email của bạn">
-                    <button>Gửi</button>
-                </div>
             </div>
         </div>
     </div>

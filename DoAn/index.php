@@ -50,7 +50,6 @@ require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khoiDauTrangChu.php";
 
     <?php require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khuVucHeroBanner.php"; ?>
     <?php require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khuVucFlashSale.php"; ?>
-    <?php require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khuVucDanhMuc.php"; ?>
     <?php require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khuVucSachBanChay.php"; ?>
     <?php require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khuVucSachMoi.php"; ?>
 

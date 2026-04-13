@@ -20,7 +20,7 @@
         <div class="form-group">
             <label>Số điện thoại</label>
             <input type="tel" name="sdt" pattern="[0-9]{10,11}" required
-                   value="<?= htmlspecialchars($thongTinKH['sdt'] ?? '') ?>"
+                   value="0<?= htmlspecialchars($thongTinKH['sdt'] ?? '') ?>"
                    placeholder="Số điện thoại...">
         </div>
         <div class="form-group">

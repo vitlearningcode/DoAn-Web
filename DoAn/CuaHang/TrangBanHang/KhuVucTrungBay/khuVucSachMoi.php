@@ -18,6 +18,11 @@
             echo hienThiTheSach($sach, [
                 ['class' => 'label-type', 'label' => 'Mới'],
             ]);
+            
+
+
+            //hiển thị mười sách, còn xem hết sẽ bấm vào nút xem tất cả
+
         endforeach; ?>
     </div>
 </section>

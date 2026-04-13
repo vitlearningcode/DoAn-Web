@@ -28,5 +28,4 @@ $ds_sachmoi = $pdo->query("
     FROM Sach s
     WHERE s.trangThai = 'DangKD'
     ORDER BY s.namSX DESC, s.maSach DESC
-    LIMIT 8
 ")->fetchAll(PDO::FETCH_ASSOC);

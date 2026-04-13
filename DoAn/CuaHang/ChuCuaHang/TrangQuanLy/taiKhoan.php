@@ -103,7 +103,7 @@ $baseUrl = 'index.php?trang=taiKhoan';
                     </td>
                     <td><?= htmlspecialchars($tk['tenND']) ?></td>
                     <td style="font-size:13px"><?= htmlspecialchars($tk['email'] ?? '—') ?></td>
-                    <td style="font-size:13px"><?= htmlspecialchars($tk['sdt'] ?? '—') ?></td>
+                    <td style="font-size:13px">0<?= htmlspecialchars($tk['sdt'] ?? '—') ?></td>
                     <td>
                         <?php if ($tk['maVT'] == 1): ?>
                             <span class="adm-badge adm-badge-purple"><i class="fas fa-crown"></i> <?= htmlspecialchars($tk['tenVT']) ?></span>
