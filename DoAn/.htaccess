@@ -1,0 +1,21 @@
+# 1. Chặn xem danh sách file trong thư mục
+Options -Indexes
+
+# 2. Bật Rewrite Engine để viết lại URL
+RewriteEngine On
+
+# 2.1 Viết lại đường dẫn trang Chi Tiết Sách (Hỗ trợ URL: /sach/chi-pheo-S012)
+RewriteRule ^sach/(?:.*-)?([A-Za-z0-9]+)$ CuaHang/TrangBanHang/ChiTietSach/layChiTietSach.php?maSach=$1 [L,QSA]
+
+# 3. Ẩn đuôi .php trên URL (URL thân thiện)
+# Ví dụ: /chiTietSach thay vì /chiTietSach.php
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# 4. Ngăn chặn người dùng truy cập trực tiếp vào các thư mục bảo mật
+RewriteRule ^KetNoi/ - [F,L]
+RewriteRule ^PhuongThuc/.*\.php$ - [F,L]
+
+# 5. Đặt mã bộ ký tự mặc định là UTF-8
+AddDefaultCharset UTF-8

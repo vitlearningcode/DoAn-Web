@@ -79,8 +79,9 @@ function hienThiTheSach(array $sach, array $nhanHieu = [], string $customHtmlBot
 
     $danhMucHtml = $theLoai ? "<span class=\"book-category\">{$theLoai}</span>" : '';
 
-    // URL trang chi tiết sách (điều hướng server-side, không dùng JS)
-    $urlChiTiet = '/DoAn-Web/DoAn/CuaHang/TrangBanHang/ChiTietSach/layChiTietSach.php?maSach=' . urlencode($sach['maSach'] ?? '');
+    // URL trang chi tiết sách (Sử dụng URL thân thiện từ .htaccess: thêm slug)
+    $slugSach = isset($sach['tenSach']) ? taoSlugSach($sach['tenSach']) : 'sach';
+    $urlChiTiet = '/DoAn-Web/DoAn/sach/' . $slugSach . '-' . urlencode($sach['maSach'] ?? '');
     
     return "
     <a class=\"book-card\"

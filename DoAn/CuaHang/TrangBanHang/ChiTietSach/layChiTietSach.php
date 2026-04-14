@@ -174,7 +174,7 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $sach ? hienThiAn($sach['tenSach']) . ' — Book Sales' : 'Không tìm thấy sách' ?></title>
     <meta name="description" content="<?= $sach ? hienThiAn(mb_substr($sach['moTa'] ?? '', 0, 160)) : 'Trang chi tiết sách' ?>">
-    <link rel="stylesheet" href="../../../GiaoDien/style.css">
+    <link rel="stylesheet" href="<?= $duong_dan_goc ?>GiaoDien/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">

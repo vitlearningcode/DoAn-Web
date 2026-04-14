@@ -78,3 +78,21 @@ function anhBanner(?string $urlAnh): string
 {
     return layDuongDanAnh($urlAnh, 'https://placehold.co/1200x450/1e3a8a/ffffff?text=Banner');
 }
+
+/**
+ * Hàm tạo slug thân thiện cho tên sách (không dấu, cách bằng dấu gạch ngang)
+ */
+function taoSlugSach($chuoi) {
+    if (!$chuoi) return 'sach';
+    $chuoi = mb_strtolower($chuoi, 'UTF-8');
+    $chuoi = preg_replace('/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/', 'a', $chuoi);
+    $chuoi = preg_replace('/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/', 'e', $chuoi);
+    $chuoi = preg_replace('/(ì|í|ị|ỉ|ĩ)/', 'i', $chuoi);
+    $chuoi = preg_replace('/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/', 'o', $chuoi);
+    $chuoi = preg_replace('/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/', 'u', $chuoi);
+    $chuoi = preg_replace('/(ỳ|ý|ỵ|ỷ|ỹ)/', 'y', $chuoi);
+    $chuoi = preg_replace('/(đ)/', 'd', $chuoi);
+    $chuoi = preg_replace('/[^a-z0-9\-]/', '-', $chuoi);
+    $chuoi = preg_replace('/-+/', '-', $chuoi);
+    return trim($chuoi, '-') ?: 'sach';
+}

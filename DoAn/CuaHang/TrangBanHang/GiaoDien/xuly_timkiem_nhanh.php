@@ -54,8 +54,9 @@ if (isset($_POST['tu_khoa'])) {
                     $giaBan = number_format($sach['giaBan'], 0, ',', '.') . ' ₫'; 
                     
                     // In ra thẻ HTML để hiển thị lên giao diện
+                    $slugTimKiem = taoSlugSach($sach['tenSach'] ?? '');
                     echo'
-                    <a href="/DoAn-Web/DoAn/CuaHang/TrangBanHang/ChiTietSach/layChiTietSach.php?maSach=' . urlencode($sach['maSach'] ?? '') . '" class="muc-ket-qua">
+                    <a href="/DoAn-Web/DoAn/sach/' . $slugTimKiem . '-' . urlencode($sach['maSach'] ?? '') . '" class="muc-ket-qua">
                         <img src="' . $anhHienThi . '" alt="' . $tenSach . '">
                         <div class="thong-tin-sach-tim-kiem">
                             <h4>' . $tenSach . '</h4>
