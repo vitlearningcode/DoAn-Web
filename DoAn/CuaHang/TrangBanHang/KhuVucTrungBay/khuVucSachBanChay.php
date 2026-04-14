@@ -9,6 +9,8 @@
         <div>
             <h3><i class="fas fa-fire-alt" style="color:#f97316"></i> Sách Bán Chạy Nhất</h3>
             <p>Top 10 bán chạy nhất tháng <?= date('n/Y') ?></p>
+        </div>
+    </div>
     <div class="books-grid" id="banchay-grid">
         <?php foreach ($ds_banchay as $sach):
             /*
