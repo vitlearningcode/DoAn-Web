@@ -1,12 +1,13 @@
 <?php
 /**
- * layGioHangCoGia.php — Helper dùng chung: lấy cartServerData và __giaSach từ DB
+ * layGioHangCoGia.php — Helper dùng chung: lấy cartServerData, __giaSach, __tonKhoMap từ DB
  *
  * BẢO MẬT: Giá luôn được lấy từ DB, không tin giá từ $_SESSION['cart'] (client-sent).
  *
  * Output:
  *   $cartServerDataArr  — mảng PHP [{maSach, soLuong, giaBan(DB), tenSach, hinhAnh, tacGia}]
  *   $giaSachMapJson     — JSON string {maSach: giaChinh} cho __giaSach JS variable
+ *   $tonKhoMapJson      — JSON string {maSach: soLuongTon} cho __tonKhoMap JS variable
  *
  * Yêu cầu: $pdo đã được khởi tạo, session_start() đã gọi.
  */
@@ -34,6 +35,7 @@ if (!empty($_SESSION['cart'])) {
                 s.maSach,
                 s.tenSach,
                 s.giaBan,
+                s.soLuongTon,
                 COALESCE(ha.urlAnh, '') AS hinhAnh,
                 COALESCE(
                     GROUP_CONCAT(DISTINCT tg.tenTG ORDER BY tg.maTG SEPARATOR ', '),
@@ -56,7 +58,7 @@ if (!empty($_SESSION['cart'])) {
             LEFT JOIN Sach_TacGia stg ON stg.maSach = s.maSach
             LEFT JOIN TacGia tg ON tg.maTG = stg.maTG
             WHERE s.maSach IN ($inPh)
-            GROUP BY s.maSach, s.tenSach, s.giaBan, ha.urlAnh
+            GROUP BY s.maSach, s.tenSach, s.giaBan, s.soLuongTon, ha.urlAnh
         ");
         $stmtCart->execute($maSachCartList);
         $sachCartInfo = [];
@@ -71,26 +73,32 @@ if (!empty($_SESSION['cart'])) {
             $giaChinh = ($info['giaSau'] !== null)
                 ? (float)$info['giaSau']
                 : (float)$info['giaBan'];
+            // Số lượng giỏ hàng không được vượt tồn kho
+            $tonKho = (int)$info['soLuongTon'];
+            $slHopLe = min($soLuongCartMap[$ms], max(0, $tonKho));
 
             $cartServerDataArr[] = [
-                'maSach'  => $ms,
-                'tenSach' => $info['tenSach'],
-                'giaBan'  => $giaChinh,   // ← giá thật từ DB
-                'hinhAnh' => $info['hinhAnh'],
-                'tacGia'  => $info['tacGia'],
-                'soLuong' => $soLuongCartMap[$ms],
+                'maSach'    => $ms,
+                'tenSach'   => $info['tenSach'],
+                'giaBan'    => $giaChinh,   // ← giá thật từ DB
+                'hinhAnh'   => $info['hinhAnh'],
+                'tacGia'    => $info['tacGia'],
+                'soLuong'   => $slHopLe,
+                'soLuongTon'=> $tonKho,     // ← giới hạn hiển thị trong giỏ
             ];
         }
     }
 }
 
-// ── 2. Xây dựng __giaSach price map cho TẤT CẢ sách đang KD ─────────────────
-// (Dùng nhẹ: chỉ lấy maSach + giá, không JOIN ảnh/tác giả)
+// ── 2. Xây dựng __giaSach + __tonKhoMap cho TẤT CẢ sách đang KD ─────────────────
+// (Dùng nhẹ: chỉ lấy maSach + giá + tồn kho, không JOIN ảnh/tác giả)
 $giaSachMapArr = [];
+$tonKhoMapArr  = [];
 try {
     $stmtMap = $pdo->query("
         SELECT
             s.maSach,
+            s.soLuongTon,
             COALESCE(
                 (
                     SELECT ROUND(s.giaBan * (1 - ckm.phanTramGiam / 100))
@@ -108,11 +116,13 @@ try {
     ");
     foreach ($stmtMap->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $giaSachMapArr[$row['maSach']] = (float)$row['giaChinh'];
+        $tonKhoMapArr[$row['maSach']]  = (int)$row['soLuongTon'];
     }
 } catch (PDOException $e) {
-    // Nếu lỗi, để map rỗng — JS sẽ fallback về 0
     $giaSachMapArr = [];
+    $tonKhoMapArr  = [];
 }
 
-$giaSachMapJson    = json_encode($giaSachMapArr, JSON_UNESCAPED_UNICODE);
+$giaSachMapJson     = json_encode($giaSachMapArr, JSON_UNESCAPED_UNICODE);
+$tonKhoMapJson      = json_encode($tonKhoMapArr,  JSON_UNESCAPED_UNICODE);
 $cartServerDataJson = json_encode($cartServerDataArr, JSON_UNESCAPED_UNICODE);

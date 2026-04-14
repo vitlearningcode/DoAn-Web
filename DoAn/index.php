@@ -39,6 +39,7 @@ if ($isLoggedIn) {
         // BẢO MẬT: cartServerData + __giaSach từ DB (không từ session/data-price client)
         var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
         var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+        var __tonKhoMap    = <?= $tonKhoMapJson  ?? '{}' ?>;
     </script>
     <?php else: ?>
     <script>

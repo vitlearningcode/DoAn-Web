@@ -187,11 +187,13 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
     <script>
         var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
         var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+        var __tonKhoMap    = <?= $tonKhoMapJson  ?? '{}' ?>;
     </script>
     <?php else: ?>
     <script>
         var cartServerData = null;
         var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+        var __tonKhoMap    = <?= $tonKhoMapJson  ?? '{}' ?>;
     </script>
     <?php endif; ?>
     <style>

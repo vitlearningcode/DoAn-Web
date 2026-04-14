@@ -181,18 +181,45 @@ var cartDrawer = (function () {
         totalMoney += item.giaBan * item.soLuong;
         totalQty += item.soLuong;
   
+        // Lấy tồn kho từ __tonKhoMap
+        var tonKho = (window.__tonKhoMap && window.__tonKhoMap[item.maSach] !== undefined)
+                     ? window.__tonKhoMap[item.maSach]
+                     : (item.soLuongTon !== undefined ? item.soLuongTon : Infinity);
+  
         // 1. Clone template
         var node = template.content.cloneNode(true);
-        var itemDiv = node.querySelector('.cart-item');
         
         // 2. Map data
-        node.querySelector('.cart-item-img').src = item.hinhAnh;
-        node.querySelector('.cart-item-title').textContent = item.tenSach;
+        node.querySelector('.cart-item-img').src = item.hinhAnh || '';
+        node.querySelector('.cart-item-title').textContent = item.tenSach || '';
         node.querySelector('.cart-item-author').textContent = item.tacGia || '';
         node.querySelector('.cart-item-price').textContent = formatMoney(item.giaBan) + ' ₫';
         node.querySelector('.qty-value').textContent = item.soLuong;
         
-        // 3. Event Listeners
+        // 3. Cảnh báo tồn kho + disable nút +
+        var warnEl  = node.querySelector('.cart-stock-warn');
+        var plusBtn = node.querySelector('.qty-plus');
+  
+        if (tonKho !== Infinity) {
+          if (item.soLuong >= tonKho) {
+            // Đạt giới hạn
+            if (warnEl) {
+              warnEl.textContent = '⚠️ Tối đa ' + tonKho + ' cuốn';
+              warnEl.className = 'cart-stock-warn at-limit';
+              warnEl.style.display = 'inline';
+            }
+            if (plusBtn) plusBtn.disabled = true;
+          } else if (tonKho <= 5) {
+            // Sắp hết
+            if (warnEl) {
+              warnEl.textContent = '⚠️ Còn ' + tonKho + ' cuốn';
+              warnEl.className = 'cart-stock-warn';
+              warnEl.style.display = 'inline';
+            }
+          }
+        }
+        
+        // 4. Event Listeners
         node.querySelector('.qty-minus').addEventListener('click', function() {
             changeQty(index, -1);
         });
@@ -205,7 +232,7 @@ var cartDrawer = (function () {
             removeItem(index);
         });
   
-        // 4. Append
+        // 5. Append
         cartItemsContainer.appendChild(node);
       });
   
@@ -218,6 +245,11 @@ var cartDrawer = (function () {
     }
   
     function addItem(thongTin, soLuongThem) {
+      // Lấy tồn kho từ __tonKhoMap (PHP inject từ DB)
+      var tonKho = (window.__tonKhoMap && window.__tonKhoMap[thongTin.maSach] !== undefined)
+                    ? window.__tonKhoMap[thongTin.maSach]
+                    : Infinity;
+  
       // Check trùng
       var foundIndex = -1;
       for (var i = 0; i < cartArr.length; i++) {
@@ -228,28 +260,47 @@ var cartDrawer = (function () {
       }
   
       if (foundIndex > -1) {
-          cartArr[foundIndex].soLuong += soLuongThem;
+        var newQty = cartArr[foundIndex].soLuong + soLuongThem;
+        if (newQty > tonKho) {
+          cartArr[foundIndex].soLuong = tonKho;
+          showToast('⚠️ Chỉ còn ' + tonKho + ' cuốn — đã giới hạn số lượng!');
+        } else {
+          cartArr[foundIndex].soLuong = newQty;
+          showToast('Đã thêm "' + thongTin.tenSach + '" vào giỏ hàng');
+        }
       } else {
-          thongTin.soLuong = soLuongThem;
-          cartArr.push(thongTin);
+        thongTin.soLuong = (tonKho !== Infinity) ? Math.min(soLuongThem, tonKho) : soLuongThem;
+        cartArr.push(thongTin);
+        showToast('Đã thêm "' + thongTin.tenSach + '" vào giỏ hàng');
       }
   
       saveCart();
       renderCart();
-      showToast('Đã thêm "' + thongTin.tenSach + '" vào giỏ hàng');
       updateHeaderIcon();
     }
   
     function changeQty(index, delta) {
-        if (!cartArr[index]) return;
-        var newQty = cartArr[index].soLuong + delta;
-        if (newQty <= 0) {
-            removeItem(index);
-        } else {
-            cartArr[index].soLuong = newQty;
-            saveCart();
-            renderCart();
-        }
+      if (!cartArr[index]) return;
+      // Lấy tồn kho
+      var ms = cartArr[index].maSach;
+      var tonKho = (window.__tonKhoMap && window.__tonKhoMap[ms] !== undefined)
+                    ? window.__tonKhoMap[ms]
+                    : Infinity;
+  
+      var newQty = cartArr[index].soLuong + delta;
+      if (newQty <= 0) {
+          removeItem(index);
+      } else if (newQty > tonKho) {
+          // Không cho vượt tồn kho
+          cartArr[index].soLuong = tonKho;
+          showToast('⚠️ Chỉ còn ' + tonKho + ' cuốn trong kho!');
+          saveCart();
+          renderCart();
+      } else {
+          cartArr[index].soLuong = newQty;
+          saveCart();
+          renderCart();
+      }
     }
   
     function removeItem(index) {

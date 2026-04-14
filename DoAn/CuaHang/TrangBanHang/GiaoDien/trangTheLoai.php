@@ -86,11 +86,13 @@ require_once '../../../PhuongThuc/layGioHangCoGia.php';
     <script>
         var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
         var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+        var __tonKhoMap    = <?= $tonKhoMapJson  ?? '{}' ?>;
     </script>
     <?php else: ?>
     <script>
         var cartServerData = null;
         var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+        var __tonKhoMap    = <?= $tonKhoMapJson  ?? '{}' ?>;
     </script>
     <?php endif; ?>
 </head>
