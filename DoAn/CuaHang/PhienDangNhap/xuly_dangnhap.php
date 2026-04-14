@@ -52,15 +52,12 @@ if (isset($_POST['btn_dangnhap'])) {
         $stmtCart->execute([$maND]);
         $rows = $stmtCart->fetchAll();
 
-        // Xây dựng mảng cart theo đúng cấu trúc JS đang dùng
+        // Xây dựng mảng cart theo cấu trúc tối giản (chỉ maSach + soLuong)
+        // BẢO MẬT: giaBan KHÔNG lưu vào session — sẽ được query DB ở kiemTraGioHang.php
         $cartArr = [];
         foreach ($rows as $row) {
             $cartArr[] = [
                 'maSach'  => $row['maSach'],
-                'tenSach' => $row['tenSach'],
-                'giaBan'  => (float)$row['giaBan'],
-                'hinhAnh' => $row['hinhAnh'],
-                'tacGia'  => $row['tacGia'],
                 'soLuong' => (int)$row['soLuong'],
             ];
         }

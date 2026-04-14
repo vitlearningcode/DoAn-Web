@@ -17,6 +17,11 @@ require_once "CuaHang/TrangBanHang/LoadDuLieu/taiQuangCao.php";
 
 // ── Khởi tạo: kiểm tra đăng nhập + xử lý cờ xóa cart ─────────────────────
 require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khoiDauTrangChu.php";
+
+// ── BẢO MẬT: Lấy cartServerData + price map từ DB (không từ session client-sent) ──
+if ($isLoggedIn) {
+    require_once "PhuongThuc/layGioHangCoGia.php";
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -31,11 +36,15 @@ require_once "CuaHang/TrangBanHang/KhuVucTrungBay/khoiDauTrangChu.php";
     <script>const dangDangNhap = <?= $isLoggedIn ? 'true' : 'false' ?>;</script>
     <?php if ($isLoggedIn): ?>
     <script>
-        // PHP render giỏ hàng từ Session vào biến JS (không AJAX, không fetch)
-        var cartServerData = <?= json_encode($_SESSION['cart'] ?? [], JSON_UNESCAPED_UNICODE) ?>;
+        // BẢO MẬT: cartServerData + __giaSach từ DB (không từ session/data-price client)
+        var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
     </script>
     <?php else: ?>
-    <script>var cartServerData = null;</script>
+    <script>
+        var cartServerData = null;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+    </script>
     <?php endif; ?>
     <?php if ($phai_xoa_cart): ?>
     <script>localStorage.removeItem('book_cart');</script>

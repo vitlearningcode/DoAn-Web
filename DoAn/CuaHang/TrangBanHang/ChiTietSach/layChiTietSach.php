@@ -178,11 +178,21 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <?php
+    // BẢO MẬT: Lấy cartServerData + price map từ DB
+    require_once '../../../PhuongThuc/layGioHangCoGia.php';
+    ?>
     <script>const dangDangNhap = <?= $isLoggedIn ? 'true' : 'false' ?>;</script>
     <?php if ($isLoggedIn): ?>
-    <script>var cartServerData = <?= json_encode($_SESSION['cart'] ?? [], JSON_UNESCAPED_UNICODE) ?>;</script>
+    <script>
+        var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+    </script>
     <?php else: ?>
-    <script>var cartServerData = null;</script>
+    <script>
+        var cartServerData = null;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+    </script>
     <?php endif; ?>
     <style>
     /* ================================================================
@@ -760,7 +770,6 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
                 <button class="ct-btn-them-gio" id="ct-btn-them-gio"
                     data-id="<?= hienThiAn($sach['maSach']) ?>"
                     data-name="<?= hienThiAn($sach['tenSach']) ?>"
-                    data-price="<?= $giaHienTai ?>"
                     data-image="<?= $hinhAnh ?>"
                     data-tac-gia="<?= hienThiAn($sach['tacGia'] ?? '') ?>">
                     <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
@@ -770,7 +779,6 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
                 <button class="ct-btn-mua-ngay" id="ct-btn-mua-ngay"
                     data-id="<?= hienThiAn($sach['maSach']) ?>"
                     data-name="<?= hienThiAn($sach['tenSach']) ?>"
-                    data-price="<?= $giaHienTai ?>"
                     data-image="<?= $hinhAnh ?>"
                     data-tac-gia="<?= hienThiAn($sach['tacGia'] ?? '') ?>">
                     <i class="fas fa-bolt"></i> Mua ngay
@@ -892,11 +900,13 @@ $giaHienTai = $sach ? ($sach['giaSau'] ?? $sach['giaBan']) : 0;
   }
 
   // ── Thêm vào giỏ từ trang chi tiết ──────────────────────────────────
+  // BẢO MẬT: Giá lấy từ __giaSach (PHP inject từ DB), không từ data-price button
   function layThongTinSach(btn) {
+    var maSach = btn.getAttribute('data-id') || '';
     return {
-      maSach : btn.getAttribute('data-id')      || '',
+      maSach : maSach,
       tenSach: btn.getAttribute('data-name')    || '',
-      giaBan : parseFloat(btn.getAttribute('data-price')) || 0,
+      giaBan : (window.__giaSach && window.__giaSach[maSach]) ? window.__giaSach[maSach] : 0,
       hinhAnh: btn.getAttribute('data-image')   || '',
       tacGia : btn.getAttribute('data-tac-gia') || '',
     };

@@ -93,10 +93,12 @@ window.themVaoGioHang = function (suKien, nutBam) {
   }
 
   // 3. MÓC DỮ LIỆU TỪ CÁC THUỘC TÍNH DATA-* TRONG HTML (Được tạo ra bởi bookCard.php)
+  // BẢO MẬT: Giá lấy từ __giaSach (PHP inject từ DB), không từ data-price (có thể F12 sửa)
+  var maSach = theSach.dataset.id || '';
   const thongTinSach = {
-    maSach: theSach.dataset.id,
+    maSach: maSach,
     tenSach: theSach.dataset.name,
-    giaBan: parseFloat(theSach.dataset.price),
+    giaBan: (window.__giaSach && window.__giaSach[maSach]) ? window.__giaSach[maSach] : 0,
     hinhAnh: theSach.dataset.image,
     tacGia: theSach.dataset.tacGia || "Đang cập nhật",
   };

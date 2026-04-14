@@ -5,8 +5,11 @@
  * Nhận form POST từ hidden form + <iframe> (KHÔNG AJAX, KHÔNG fetch).
  * Đồng bộ giỏ hàng vào bảng GioHang trong DB.
  *
+ * BẢO MẬT: Chỉ lưu maSach + soLuong vào DB.
+ * Giá (giaBan) KHÔNG được lấy từ client — luôn được đọc từ DB.
+ *
  * POST params:
- *   cart_json — chuỗi JSON mảng [{maSach, soLuong, tenSach, giaBan, hinhAnh, tacGia}]
+ *   cart_json — chuỗi JSON mảng [{maSach, soLuong, ...}]
  *   Nếu rỗng hoặc [] → xóa hết giỏ hàng của user trong DB.
  */
 session_start();
@@ -59,8 +62,20 @@ try {
 
     $pdo->commit();
 
-    // Cập nhật session để trang hiện tại cũng đồng bộ
-    $_SESSION['cart'] = $cartArr;
+    // BẢO MẬT: Chỉ lưu maSach + soLuong vào session.
+    // Giá KHÔNG được lấy từ $cartArr (client-side) — sẽ được query DB ở kiemTraGioHang.php.
+    $sessionCart = [];
+    foreach ($cartArr as $item) {
+        $ms = trim($item['maSach'] ?? '');
+        $sl = max(1, (int)($item['soLuong'] ?? 1));
+        if ($ms !== '') {
+            $sessionCart[] = [
+                'maSach'  => $ms,
+                'soLuong' => $sl,
+            ];
+        }
+    }
+    $_SESSION['cart'] = $sessionCart;
 
 } catch (Exception $e) {
     $pdo->rollBack();

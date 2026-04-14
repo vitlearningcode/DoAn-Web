@@ -64,6 +64,9 @@ if ($tenTheLoai !== '') {
         error_log('[TrangLocSach] Lỗi: ' . $e->getMessage());
     }
 }
+
+// BẢO MẬT: Lấy cartServerData + price map từ DB
+require_once '../../../PhuongThuc/layGioHangCoGia.php';
 ?>
 
 <!DOCTYPE html>
@@ -80,9 +83,15 @@ if ($tenTheLoai !== '') {
     
     <script>const dangDangNhap = <?= $isLoggedIn ? 'true' : 'false' ?>;</script>
     <?php if ($isLoggedIn): ?>
-    <script>var cartServerData = <?= json_encode($_SESSION['cart'] ?? [], JSON_UNESCAPED_UNICODE) ?>;</script>
+    <script>
+        var cartServerData = <?= $cartServerDataJson ?? '[]' ?>;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+    </script>
     <?php else: ?>
-    <script>var cartServerData = null;</script>
+    <script>
+        var cartServerData = null;
+        var __giaSach      = <?= $giaSachMapJson ?? '{}' ?>;
+    </script>
     <?php endif; ?>
 </head>
 <body>

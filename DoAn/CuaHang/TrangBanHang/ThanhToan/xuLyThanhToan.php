@@ -71,20 +71,46 @@ $tongTien  = 0;
 
 $pdo->beginTransaction();
 try {
-    // 4. KIỂM TRA & TRỪ KHO
+    // 4. KIỂM TRA & TRỪ KHO + LẤY GIÁ TỪ DB
     foreach ($gioHang as $sanPham) {
         $maSach  = $sanPham['maSach'];
         $soLuong = (int)$sanPham['soLuong'];
 
-        $stmtKho = $pdo->prepare("SELECT soLuongTon, tenSach FROM Sach WHERE maSach = ? FOR UPDATE");
+        // BẢO MẬT: Luôn lấy giá từ DB, không tin giá từ session/client
+        $stmtKho = $pdo->prepare("
+            SELECT s.soLuongTon, s.tenSach, s.giaBan,
+                   (
+                       SELECT ROUND(s.giaBan * (1 - ckm.phanTramGiam / 100))
+                       FROM ChiTietKhuyenMai ckm
+                       JOIN KhuyenMai km ON km.maKM = ckm.maKM
+                       WHERE ckm.maSach = s.maSach
+                         AND NOW() BETWEEN km.ngayBatDau AND km.ngayKetThuc
+                       ORDER BY ckm.phanTramGiam DESC
+                       LIMIT 1
+                   ) AS giaSau
+            FROM Sach s
+            WHERE s.maSach = ? FOR UPDATE
+        ");
         $stmtKho->execute([$maSach]);
         $sachDB = $stmtKho->fetch();
 
         if (!$sachDB || $sachDB['soLuongTon'] < $soLuong) {
-            throw new Exception("Sản phẩm '{$sanPham['tenSach']}' không đủ số lượng trong kho.");
+            throw new Exception("Sản phẩm '{$sachDB['tenSach']}' không đủ số lượng trong kho.");
         }
 
-        $tongTien += $sanPham['giaBan'] * $soLuong;
+        // Giá thực tế: ưu tiên giá sau khuyến mãi (flash sale), không thì lấy giá gốc
+        $giaChinh = ($sachDB['giaSau'] !== null)
+            ? (float)$sachDB['giaSau']
+            : (float)$sachDB['giaBan'];
+
+        $tongTien += $giaChinh * $soLuong;
+
+        // Lưu giá đã xác thực vào item để dùng ở bước lưu chi tiết
+        $gioHang_validated[$maSach] = [
+            'giaChinh' => $giaChinh,
+            'soLuong'  => $soLuong,
+            'tenSach'  => $sachDB['tenSach'],
+        ];
 
         $stmtTruKho = $pdo->prepare("UPDATE Sach SET soLuongTon = soLuongTon - ? WHERE maSach = ?");
         $stmtTruKho->execute([$soLuong, $maSach]);
@@ -94,13 +120,14 @@ try {
     $stmtDH = $pdo->prepare("INSERT INTO DonHang (maDH, maND, maDC, maPT, tongTien, trangThai) VALUES (?, ?, ?, ?, ?, 'ChoDuyet')");
     $stmtDH->execute([$maDonHang, $maND, $maDC, $phuongThuc, $tongTien]);
 
-    // 6. LƯU CHI TIẾT ĐƠN
+    // 6. LƯU CHI TIẾT ĐƠN (dùng giá đã được xác thực từ DB ở bước 4)
     foreach ($gioHang as $sanPham) {
-        $soLuong   = (int)$sanPham['soLuong'];
-        $giaBan    = (float)$sanPham['giaBan'];
+        $ms        = $sanPham['maSach'];
+        $soLuong   = (int)$gioHang_validated[$ms]['soLuong'];
+        $giaBan    = (float)$gioHang_validated[$ms]['giaChinh'];  // ← giá từ DB, không từ session
         $thanhTien = $soLuong * $giaBan;
         $stmtCT    = $pdo->prepare("INSERT INTO ChiTietDH (maDH, maSach, soLuong, giaBan, thanhTien) VALUES (?, ?, ?, ?, ?)");
-        $stmtCT->execute([$maDonHang, $sanPham['maSach'], $soLuong, $giaBan, $thanhTien]);
+        $stmtCT->execute([$maDonHang, $ms, $soLuong, $giaBan, $thanhTien]);
     }
 
     $pdo->commit();
