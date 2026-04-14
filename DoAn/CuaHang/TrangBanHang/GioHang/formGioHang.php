@@ -25,7 +25,7 @@
         <div id="cart-items" class="cart-items">
             <!-- JS cloneNode từ template xuống đây -->
             <div id="cart-empty-msg" class="cart-empty-msg" style="display: none;">
-                <div class="cart-empty-icon">🛒</div>
+                <div class="cart-empty-icon"></div>
                 <p class="cart-empty-text">Giỏ hàng của bạn đang trống trơn!</p>
                 <p class="cart-empty-sub">Hãy ra ngoài chọn vài cuốn sách nhé...</p>
                 
@@ -68,6 +68,7 @@
             <div class="cart-item-bottom">
                 <div>
                     <span class="cart-item-price"></span>
+                    <span class="cart-stock-warn"></span>
                 </div>
                 <div class="cart-item-qty">
                     <button type="button" class="qty-btn qty-minus">-</button>

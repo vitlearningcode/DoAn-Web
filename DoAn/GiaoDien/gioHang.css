@@ -304,6 +304,33 @@
     height: 1rem;
 }
 
+/* ── Cảnh báo tồn kho thấp trong giỏ hàng ── */
+.cart-stock-warn {
+    display: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #ea580c;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-top: 3px;
+}
+
+.cart-stock-warn.at-limit {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.qty-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.qty-btn:disabled:hover {
+    color: #6b7280;
+}
+
 /* 6. Footer Checkout */
 .cart-footer {
     padding: 1.5rem;
