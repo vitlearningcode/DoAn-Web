@@ -92,6 +92,25 @@ window.themVaoGioHang = function (suKien, nutBam) {
     return;
   }
 
+  // 2b. KIỂM TRA HẾT HÀNG — chặn sớm trước khi làm bất cứ điều gì
+  var tonKhoKT = parseInt(theSach.dataset.tonKho, 10);
+  if (!isNaN(tonKhoKT) && tonKhoKT <= 0) {
+    var toastEl  = document.getElementById('cart-toast');
+    var toastMsg = document.getElementById('toast-message');
+    if (toastEl && toastMsg) {
+      toastMsg.textContent = '❌ Sản phẩm này hiện đã hết hàng!';
+      toastEl.classList.remove('show', 'toast-warning', 'toast-error');
+      toastEl.classList.add('show', 'toast-error');
+      clearTimeout(toastEl._warnTimer);
+      toastEl._warnTimer = setTimeout(function () {
+        toastEl.classList.remove('show', 'toast-error');
+      }, 3000);
+    } else {
+      alert('Sản phẩm này hiện đã hết hàng!');
+    }
+    return; // Dừng, không thêm vào giỏ
+  }
+
   // 3. MÓC DỮ LIỆU TỪ CÁC THUỘC TÍNH DATA-* TRONG HTML (Được tạo ra bởi bookCard.php)
   // BẢO MẬT: Giá lấy từ __giaSach (PHP inject từ DB), không từ data-price (có thể F12 sửa)
   var maSach = theSach.dataset.id || '';
@@ -114,18 +133,18 @@ window.themVaoGioHang = function (suKien, nutBam) {
   // 5. CẢNH BÁO TỒN KHO THẤP (đọc data-ton-kho từ PHP bookCard render sẵn)
   var tonKho = parseInt(theSach.dataset.tonKho, 10);
   if (!isNaN(tonKho) && tonKho <= 5 && tonKho > 0) {
-    // Hiển thị toast cảnh báo vàng sau 400ms (để toast "Đã thêm" hiện trước)
+    // Hiển thị toast cảnh báo vàng sau 800ms (để toast "Đã thêm" hiện trước)
     setTimeout(function () {
       var toastEl  = document.getElementById('cart-toast');
       var toastMsg = document.getElementById('toast-message');
       if (toastEl && toastMsg) {
         toastMsg.textContent = '⚠️ Chỉ còn ' + tonKho + ' cuốn — đặt hàng ngay!';
-        toastEl.classList.remove('toast-success', 'toast-warning');
-        toastEl.classList.add('active', 'toast-warning');
+        toastEl.classList.remove('show', 'toast-error', 'toast-warning');
+        toastEl.classList.add('show', 'toast-warning');
         // Tự ẩn sau 3 giây
         clearTimeout(toastEl._warnTimer);
         toastEl._warnTimer = setTimeout(function () {
-          toastEl.classList.remove('active');
+          toastEl.classList.remove('show', 'toast-warning');
         }, 3000);
       }
     }, 800);

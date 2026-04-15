@@ -145,6 +145,8 @@ var cartDrawer = (function () {
         if (toastTimeout) clearTimeout(toastTimeout);
         
         toastMsg.textContent = message;
+        // Reset màu về mặc định trước khi hiện
+        toastEl.classList.remove('toast-warning', 'toast-error');
         toastEl.classList.add('show');
         
         toastTimeout = setTimeout(function() {
@@ -249,7 +251,21 @@ var cartDrawer = (function () {
       var tonKho = (window.__tonKhoMap && window.__tonKhoMap[thongTin.maSach] !== undefined)
                     ? window.__tonKhoMap[thongTin.maSach]
                     : Infinity;
-  
+
+      // ── CHẶN HẾT HÀNG (lớp phòng thủ thứ 2) ──────────────────────────
+      if (tonKho !== Infinity && tonKho <= 0) {
+        if (toastEl && toastMsg) {
+          toastMsg.textContent = '❌ Sản phẩm này hiện đã hết hàng!';
+          toastEl.classList.remove('show', 'toast-warning', 'toast-error');
+          toastEl.classList.add('show', 'toast-error');
+          if (toastTimeout) clearTimeout(toastTimeout);
+          toastTimeout = setTimeout(function() {
+            toastEl.classList.remove('show', 'toast-error');
+          }, 3000);
+        }
+        return; // Không thêm vào giỏ, không gọi showToast thành công
+      }
+
       // Check trùng
       var foundIndex = -1;
       for (var i = 0; i < cartArr.length; i++) {
@@ -276,6 +292,7 @@ var cartDrawer = (function () {
   
       saveCart();
       renderCart();
+
       updateHeaderIcon();
     }
   
