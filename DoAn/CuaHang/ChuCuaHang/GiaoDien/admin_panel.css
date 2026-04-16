@@ -95,7 +95,8 @@ body.admin-body {
 .adm-sidebar-logo .logo-icon {
   width: 40px;
   height: 40px;
-  background: #2563eb;
+  /* background: #2563eb; */
+  /* background: white; */
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -108,13 +109,15 @@ body.admin-body {
 .adm-sidebar-logo .logo-text h2 {
   font-size: 15px;
   font-weight: 700;
-  color: #fff;
+  /* color: #fff; */
+  color: #3d6be3;
   line-height: 1.2;
 }
 
 .adm-sidebar-logo .logo-text p {
   font-size: 11px;
-  color: #64748b;
+  /* color: #64748b; */
+  color: #F7911E;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
